@@ -1,0 +1,14 @@
+{
+  "name": "ChatLinx — AI Conversation Continuity Engine",
+  "short_name": "ChatLinx",
+  "description": "Turn messy AI interactions into structured, reusable context.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09100a",
+  "theme_color": "#09100a",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

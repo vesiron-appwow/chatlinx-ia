@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ChatLinx — AI Conversation Continuity Engine</title>
+<meta name="description" content="Turn messy AI interactions into structured, reusable context. Continue conversations across any AI platform without restarting.">
+<meta name="theme-color" content="#09100a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="ChatLinx">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="apple-touch-startup-image" href="/icons/icon-512.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg0: #09100a;
+  --bg1: #0f1710;
+  --bg2: #151e16;
+  --bg3: #1c271d;
+  --bg4: #222e23;
+  --surface: #29362a;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --text: #deeadf;
+  --text2: #8faa92;
+  --text3: #4d6650;
+  --green: #52c46a;
+  --green-dim: #3a9450;
+  --green-dark: #1a4422;
+  --green-glow: rgba(82,196,106,0.07);
+  --green-glow2: rgba(82,196,106,0.14);
+  --amber: #e8a44a;
+  --blue: #4a9fd4;
+  --purple: #9b7fd4;
+  --r: 7px;
+  --r2: 11px;
+  --font: 'DM Sans', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  --display: 'Bebas Neue', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: var(--bg0); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.5; overflow: hidden; }
+
+/* ── SHELL ── */
+.shell { display: grid; grid-template-rows: 50px 1fr; grid-template-columns: 188px 1fr; height: 100vh; }
+
+/* ── TOPBAR ── */
+.topbar { grid-column: 1/-1; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; background: var(--bg1); border-bottom: 1px solid var(--border); }
+.logo { display: flex; align-items: center; gap: 8px; }
+.logo-gem { width: 26px; height: 26px; background: var(--green-dark); border: 1px solid var(--green-dark); border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+.logo-gem svg { width: 13px; height: 13px; }
+.logo-word { font-family: var(--display); font-size: 19px; letter-spacing: 2.5px; }
+.logo-word em { color: var(--green); font-style: normal; }
+.topbar-nav { display: flex; gap: 2px; }
+.tnav { padding: 5px 14px; border-radius: var(--r); font-size: 12px; font-weight: 500; color: var(--text2); cursor: pointer; border: 1px solid transparent; background: transparent; transition: all .12s; font-family: var(--font); }
+.tnav:hover { background: var(--bg3); color: var(--text); }
+.tnav.on { background: var(--green-glow2); color: var(--green); border-color: var(--green-dark); }
+.topbar-right { display: flex; align-items: center; gap: 8px; }
+.distil-btn { display: flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: var(--r); background: var(--green-dark); border: 1px solid var(--green-dim); color: var(--green); font-size: 13px; font-weight: 600; cursor: pointer; font-family: var(--font); transition: all .15s; }
+.distil-btn:hover { background: var(--green-dim); }
+.distil-icon { font-size: 15px; }
+.help-btn { width: 28px; height: 28px; border-radius: var(--r); border: 1px solid var(--border2); background: transparent; color: var(--text3); cursor: pointer; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; transition: all .12s; font-family: var(--font); }
+.help-btn:hover { background: var(--bg3); color: var(--text2); border-color: var(--border2); }
+
+/* ── ONBOARDING ── */
+.onboard-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.88); display: flex; align-items: center; justify-content: center; z-index: 300; }
+.onboard-modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: 14px; width: 480px; max-height: 90vh; overflow-y: auto; }
+.onboard-hero { padding: 28px 28px 20px; text-align: center; border-bottom: 1px solid var(--border); }
+.onboard-gem { width: 48px; height: 48px; background: var(--green-dark); border: 1px solid var(--green-dim); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+.onboard-gem svg { width: 22px; height: 22px; }
+.onboard-title { font-family: var(--display); font-size: 26px; letter-spacing: 3px; color: var(--text); margin-bottom: 6px; }
+.onboard-title em { color: var(--green); font-style: normal; }
+.onboard-tagline { font-size: 13px; color: var(--text2); margin-bottom: 4px; }
+.onboard-body { padding: 20px 28px 24px; }
+.onboard-loop { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 22px; flex-wrap: wrap; }
+.ol-step { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.ol-num { width: 30px; height: 30px; border-radius: 50%; background: var(--green-dark); border: 1px solid var(--green-dim); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--green); font-family: var(--mono); }
+.ol-label { font-size: 10px; color: var(--text2); text-align: center; max-width: 65px; line-height: 1.3; }
+.ol-arrow { width: 18px; height: 1px; background: var(--green-dark); margin: 0 2px; margin-bottom: 18px; flex-shrink: 0; }
+.onboard-rules { display: flex; flex-direction: column; gap: 7px; margin-bottom: 20px; }
+.onboard-rule { display: flex; align-items: flex-start; gap: 9px; font-size: 12px; color: var(--text2); line-height: 1.4; }
+.onboard-rule-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); flex-shrink: 0; margin-top: 5px; }
+
+/* ── HELP MODAL ── */
+.help-tabs { display: flex; gap: 2px; padding: 14px 18px 0; border-bottom: 1px solid var(--border); }
+.htab { padding: 6px 14px; border-radius: var(--r) var(--r) 0 0; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid transparent; border-bottom: none; color: var(--text3); background: transparent; transition: all .12s; font-family: var(--font); }
+.htab:hover { color: var(--text2); }
+.htab.on { background: var(--bg3); color: var(--green); border-color: var(--border2); border-bottom-color: var(--bg3); }
+.help-pane { display: none; padding: 18px 20px 22px; }
+.help-pane.on { display: block; }
+.help-h1 { font-family: var(--display); font-size: 17px; letter-spacing: 1.5px; color: var(--green); margin-bottom: 12px; }
+.help-h2 { font-size: 11px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; color: var(--text3); margin: 14px 0 6px; }
+.help-p { font-size: 12px; color: var(--text2); line-height: 1.6; margin-bottom: 8px; }
+.help-step { display: flex; align-items: flex-start; gap: 9px; font-size: 12px; color: var(--text); margin-bottom: 8px; line-height: 1.4; }
+.help-step-n { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--green); background: var(--green-dark); width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.help-rule { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: var(--text2); margin-bottom: 6px; line-height: 1.4; }
+.help-rule-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--text3); flex-shrink: 0; margin-top: 6px; }
+.help-warning { background: var(--bg3); border: 1px solid var(--border2); border-left: 3px solid var(--amber); border-radius: var(--r); padding: 10px 12px; font-size: 12px; color: var(--text2); line-height: 1.5; margin: 8px 0; }
+
+/* ── SIDEBAR ── */
+.sidebar { background: var(--bg1); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 14px 10px; gap: 2px; }
+.sb-lbl { font-size: 9px; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; color: var(--text3); padding: 0 6px; margin: 10px 0 4px; }
+.sb-lbl:first-child { margin-top: 0; }
+.sb-item { display: flex; align-items: center; gap: 7px; padding: 7px 8px; border-radius: var(--r); cursor: pointer; font-size: 12px; font-weight: 500; color: var(--text2); transition: all .12s; border: 1px solid transparent; }
+.sb-item:hover { background: var(--bg3); color: var(--text); }
+.sb-item.on { background: var(--green-glow); color: var(--green); border-color: var(--green-dark); }
+.sb-icon { font-size: 13px; width: 16px; text-align: center; }
+.sb-count { margin-left: auto; font-family: var(--mono); font-size: 10px; color: var(--text3); background: var(--bg3); padding: 1px 5px; border-radius: 4px; }
+.sb-item.on .sb-count { background: var(--green-dark); color: var(--green); }
+.sb-add { display: flex; align-items: center; gap: 6px; padding: 6px 8px; margin: 4px 0; border-radius: var(--r); cursor: pointer; font-size: 11px; color: var(--text3); border: 1px dashed var(--text3); transition: all .12s; }
+.sb-add:hover { color: var(--green); border-color: var(--green-dark); background: var(--green-glow); }
+.proj-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.sb-divider { height: 1px; background: var(--border); margin: 8px 0; }
+.sb-footer { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border); }
+.tagline { font-size: 10px; color: var(--text3); line-height: 1.5; font-style: italic; padding: 0 4px; }
+
+/* ── WORKSPACE ── */
+.workspace { overflow-y: auto; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; background: var(--bg0); }
+.view { display: none; flex-direction: column; flex: 1; }
+.view.on { display: flex; }
+
+/* ── VIEW HEADER ── */
+.vhead { padding: 20px 22px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.vhead-row { display: flex; align-items: center; justify-content: space-between; }
+.vhead-title { font-family: var(--display); font-size: 20px; letter-spacing: 2px; color: var(--text); }
+.vhead-sub { font-size: 12px; color: var(--text3); margin-top: 3px; }
+.vbody { padding: 18px 22px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+
+/* ── BUTTONS ── */
+.btn { padding: 6px 14px; border-radius: var(--r); font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid; font-family: var(--font); transition: all .12s; }
+.btn-ghost { background: transparent; border-color: var(--border2); color: var(--text2); }
+.btn-ghost:hover { background: var(--bg3); color: var(--text); border-color: var(--border2); }
+.btn-prime { background: var(--green-dark); border-color: var(--green-dim); color: var(--green); }
+.btn-prime:hover { background: var(--green-dim); }
+.btn-lg { padding: 10px 22px; font-size: 13px; }
+.btn-full { width: 100%; justify-content: center; display: flex; align-items: center; gap: 7px; }
+
+/* ── EMPTY STATE ── */
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; text-align: center; padding: 40px 20px; }
+.empty-icon { font-size: 40px; margin-bottom: 16px; opacity: .2; }
+.empty-title { font-family: var(--display); font-size: 20px; letter-spacing: 2px; color: var(--text3); margin-bottom: 8px; }
+.empty-sub { font-size: 13px; color: var(--text3); margin-bottom: 24px; line-height: 1.6; max-width: 300px; }
+
+/* ── TASK LIST ── */
+.task-list { display: flex; flex-direction: column; gap: 6px; }
+.task-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r2); padding: 12px 14px; cursor: pointer; transition: all .12s; border-left: 3px solid transparent; }
+.task-card:hover { border-color: var(--border2); background: var(--bg3); }
+.task-card.on { border-color: var(--border2); border-left-color: var(--green); background: var(--bg3); }
+.task-card.done { opacity: .5; }
+.tc-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 5px; }
+.tc-name { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.3; }
+.tc-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.tc-proj { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; letter-spacing: .5px; }
+.tc-ai { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; border: 1px solid; }
+.ai-claude { background: rgba(155,127,212,.1); color: var(--purple); border-color: rgba(155,127,212,.2); }
+.ai-gpt { background: rgba(74,159,212,.1); color: var(--blue); border-color: rgba(74,159,212,.2); }
+.ai-any { background: var(--bg4); color: var(--text3); border-color: var(--border); }
+.tc-state { font-size: 11px; color: var(--text3); line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.tc-done-check { font-size: 14px; color: var(--green); flex-shrink: 0; }
+.task-actions { display: flex; gap: 6px; margin-top: 8px; }
+.icon-btn { width: 26px; height: 26px; border-radius: 5px; border: 1px solid var(--border); background: transparent; color: var(--text3); cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; transition: all .12s; }
+.icon-btn:hover { background: var(--bg4); color: var(--text); border-color: var(--border2); }
+
+/* ── STATUS CHIPS ── */
+.status-chip { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; letter-spacing: .5px; }
+.chip-active { background: var(--green-glow2); color: var(--green); }
+.chip-todo { background: var(--bg4); color: var(--text3); }
+.chip-done { background: rgba(74,159,212,.1); color: var(--blue); }
+
+/* ── FILTER ROW ── */
+.filter-row { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
+.fchip { padding: 4px 11px; border-radius: 20px; font-size: 11px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); color: var(--text3); background: transparent; transition: all .12s; font-family: var(--font); }
+.fchip:hover { border-color: var(--border2); color: var(--text); }
+.fchip.on { background: var(--green-glow2); color: var(--green); border-color: var(--green-dark); }
+
+/* ── DISTIL VIEW ── */
+.distil-hero { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r2); padding: 20px; text-align: center; }
+.dh-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; color: var(--text3); margin-bottom: 6px; }
+.dh-title { font-family: var(--display); font-size: 24px; letter-spacing: 2px; color: var(--text); margin-bottom: 6px; }
+.dh-sub { font-size: 12px; color: var(--text2); margin-bottom: 18px; line-height: 1.5; }
+.distil-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.distil-panel { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r2); overflow: hidden; }
+.dp-head { padding: 10px 13px; border-bottom: 1px solid var(--border); background: var(--bg3); display: flex; align-items: center; justify-content: space-between; }
+.dp-title { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--green); }
+.dp-count { font-family: var(--mono); font-size: 10px; color: var(--text3); }
+.dp-body { padding: 12px 13px; display: flex; flex-direction: column; gap: 7px; }
+.dp-item { display: flex; align-items: flex-start; gap: 7px; font-size: 12px; color: var(--text); line-height: 1.4; }
+.dp-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.dot-green { background: var(--green); }
+.dot-amber { background: var(--amber); }
+.dot-blue { background: var(--blue); }
+.dot-dead { background: var(--text3); }
+.dp-dead { text-decoration: line-through; opacity: .4; }
+.dp-empty { font-size: 12px; color: var(--text3); font-style: italic; }
+.distil-cta { background: var(--bg2); border: 1px solid var(--green-dark); border-radius: var(--r2); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.dca-text { font-size: 13px; color: var(--text2); }
+.dca-text strong { color: var(--text); font-weight: 600; }
+
+/* ── CONTEXT PACK VIEW ── */
+.pack-hero { background: var(--bg2); border: 1px solid var(--green-dark); border-radius: var(--r2); overflow: hidden; }
+.ph-head { padding: 14px 18px; background: var(--bg3); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+.ph-icon { width: 32px; height: 32px; border-radius: var(--r); background: var(--green-dark); border: 1px solid var(--green-dim); display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+.ph-info { flex: 1; }
+.ph-title { font-family: var(--display); font-size: 15px; letter-spacing: 1.5px; color: var(--green); }
+.ph-sub { font-size: 11px; color: var(--text3); margin-top: 1px; }
+.ph-actions { display: flex; gap: 6px; }
+.pack-body { padding: 14px 18px; display: flex; flex-direction: column; gap: 7px; }
+.pack-row { display: flex; align-items: flex-start; gap: 8px; padding: 8px 10px; border-radius: var(--r); background: var(--bg3); border: 1px solid var(--border); }
+.pr-check { width: 14px; height: 14px; border-radius: 3px; background: var(--green-dark); border: 1px solid var(--green-dim); display: flex; align-items: center; justify-content: center; font-size: 9px; color: var(--green); flex-shrink: 0; margin-top: 1px; }
+.pr-text { font-size: 12px; color: var(--text); flex: 1; line-height: 1.4; }
+.pr-source { font-size: 10px; color: var(--text3); font-family: var(--mono); white-space: nowrap; margin-left: auto; flex-shrink: 0; }
+.pack-footer { padding: 12px 18px 14px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.pf-hint { font-size: 11px; color: var(--text3); font-style: italic; }
+.copy-row { display: flex; gap: 6px; }
+
+/* ── PACK PREVIEW (raw text) ── */
+.pack-raw { background: var(--bg1); border: 1px solid var(--border); border-radius: var(--r2); padding: 14px 16px; font-family: var(--mono); font-size: 11px; color: var(--text2); line-height: 1.7; white-space: pre-wrap; }
+
+/* ── MODAL ── */
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,.78); display: flex; align-items: center; justify-content: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity .18s; }
+.overlay.open { opacity: 1; pointer-events: all; }
+.modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: 13px; padding: 22px; width: 460px; max-height: 85vh; overflow-y: auto; transform: translateY(8px); transition: transform .18s; }
+.overlay.open .modal { transform: translateY(0); }
+.modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.modal-title { font-family: var(--display); font-size: 17px; letter-spacing: 2px; color: var(--green); }
+.modal-close { width: 26px; height: 26px; border-radius: var(--r); border: 1px solid var(--border2); background: transparent; color: var(--text2); cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; transition: all .12s; }
+.modal-close:hover { background: var(--bg4); color: var(--text); }
+.form-group { margin-bottom: 13px; }
+.form-label { display: block; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text3); margin-bottom: 5px; }
+.form-input { width: 100%; padding: 8px 11px; border-radius: var(--r); background: var(--bg3); border: 1px solid var(--border2); color: var(--text); font-family: var(--font); font-size: 13px; outline: none; transition: border-color .12s; }
+.form-input:focus { border-color: var(--green-dim); }
+.form-textarea { width: 100%; padding: 9px 11px; border-radius: var(--r); background: var(--bg3); border: 1px solid var(--border2); color: var(--text); font-family: var(--font); font-size: 13px; outline: none; resize: vertical; min-height: 90px; line-height: 1.5; transition: border-color .12s; }
+.form-textarea:focus { border-color: var(--green-dim); }
+.form-select { width: 100%; padding: 8px 11px; border-radius: var(--r); background: var(--bg3); border: 1px solid var(--border2); color: var(--text); font-family: var(--font); font-size: 13px; outline: none; cursor: pointer; }
+.form-hint { font-size: 11px; color: var(--text3); margin-top: 4px; font-style: italic; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+
+/* ── TOAST ── */
+.toast { position: fixed; bottom: 18px; right: 18px; background: var(--bg2); border: 1px solid var(--green-dark); border-radius: var(--r2); padding: 10px 14px; font-size: 12px; color: var(--text); display: flex; align-items: center; gap: 8px; transform: translateY(60px); opacity: 0; transition: all .2s; z-index: 200; max-width: 320px; }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast-icon { color: var(--green); font-size: 15px; flex-shrink: 0; }
+
+/* ── PULSE ── */
+@keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(82,196,106,.3)} 50%{box-shadow:0 0 0 6px rgba(82,196,106,0)} }
+.pulse { animation: pulse 2.5s ease-in-out infinite; }
+
+/* ── SCROLL ── */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 2px; }
+
+/* ── STEP FLOW (first run) ── */
+.step-flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; justify-content: center; }
+.step-node { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--bg4); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--text3); font-family: var(--mono); }
+.step-num.active { background: var(--green-dark); border-color: var(--green-dim); color: var(--green); }
+.step-label { font-size: 10px; color: var(--text3); text-align: center; max-width: 70px; line-height: 1.3; }
+.step-label.active { color: var(--text2); }
+.step-arrow { width: 24px; height: 1px; background: var(--border2); margin: 0 4px; margin-bottom: 16px; flex-shrink: 0; }
+
+/* ── SECTION LABEL ── */
+.sec-label { font-size: 10px; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; color: var(--text3); }
+.sec-row { display: flex; align-items: center; justify-content: space-between; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ══ TOPBAR ══ -->
+<header class="topbar">
+  <div class="logo">
+    <div class="logo-gem">
+      <svg viewBox="0 0 13 13" fill="none"><path d="M6.5 1L11 3.5V9.5L6.5 12L2 9.5V3.5L6.5 1Z" stroke="#52c46a" stroke-width="1" fill="rgba(82,196,106,.12)"/><path d="M6.5 1V12M2 3.5L11 9.5M11 3.5L2 9.5" stroke="#52c46a" stroke-width=".5" opacity=".5"/></svg>
+    </div>
+    <span class="logo-word">CHAT<em>LINX</em></span>
+  </div>
+  <nav class="topbar-nav">
+    <button class="tnav on" onclick="go('tasks',this)">Tasks</button>
+    <button class="tnav" onclick="go('distil',this)">Distil</button>
+    <button class="tnav" onclick="go('context',this)">Context Pack</button>
+  </nav>
+  <div class="topbar-right">
+    <button class="help-btn" onclick="openModal('help')" title="Help, Terms & Privacy">?</button>
+    <button class="distil-btn" onclick="runDistil()">
+      <span class="distil-icon">⚡</span> Distil
+    </button>
+  </div>
+</header>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar">
+  <div class="sb-lbl">Workspace</div>
+  <div class="sb-item on" onclick="go('tasks',null)" id="sb-tasks"><span class="sb-icon">▦</span> Tasks <span class="sb-count" id="sb-task-count">0</span></div>
+  <div class="sb-item" onclick="go('distil',null)" id="sb-distil"><span class="sb-icon">⚡</span> Distil <span class="sb-count" id="sb-distil-count">—</span></div>
+  <div class="sb-item" onclick="go('context',null)" id="sb-context"><span class="sb-icon">⬡</span> Context Pack</div>
+  <div class="sb-divider"></div>
+  <div class="sb-lbl">Projects</div>
+  <div class="sb-item" onclick="filterProj('Work')"><div class="proj-dot" style="background:#52c46a"></div> Work <span class="sb-count" id="sb-sl">0</span></div>
+  <div class="sb-item" onclick="filterProj('Research')"><div class="proj-dot" style="background:#4a9fd4"></div> Research <span class="sb-count" id="sb-ml">0</span></div>
+  <div class="sb-item" onclick="filterProj('Build')"><div class="proj-dot" style="background:#e8a44a"></div> Build <span class="sb-count" id="sb-aw">0</span></div>
+  <div class="sb-item" onclick="filterProj('Strategy')"><div class="proj-dot" style="background:#9b7fd4"></div> Strategy <span class="sb-count" id="sb-se">0</span></div>
+  <div class="sb-add" onclick="openModal('new-task')">+ New task</div>
+  <div class="sb-footer">
+    <button class="sb-add" id="sb-install-btn" style="margin:0 0 4px" onclick="triggerInstall()">⬇ Install App</button>
+    <button class="sb-add" style="margin:0 0 8px" onclick="exportData()">⎘ Export Backup</button>
+    <div class="tagline">"Pick up any AI conversation instantly"</div>
+    <div style="font-size:9px;color:var(--text3);margin-top:6px;padding:0 4px;line-height:1.5">Built with vDig-Forge<br>Vesiron Digital IA Engine · v1.0.0</div>
+    <div class="sb-add" style="margin-top:8px" onclick="window.open('https://appwow.app','_blank')">⬡ Explore more IAs</div>
+  </div>
+</aside>
+
+<!-- ══ WORKSPACE ══ -->
+<main class="workspace">
+
+  <!-- ── TASKS VIEW ── -->
+  <div class="view on" id="view-tasks">
+
+    <!-- APPWOW HERO ENTRY LAYER -->
+    <div id="tasks-hero" style="padding:18px 22px 16px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(82,196,106,.06),transparent);flex-shrink:0">
+      <div style="font-size:9px;letter-spacing:1.8px;text-transform:uppercase;color:var(--text3);margin-bottom:5px;font-weight:700">Featured Instant App · vDig-Forge</div>
+      <div style="font-family:var(--display);font-size:22px;letter-spacing:2.5px;margin-bottom:5px;color:var(--text)">CONTINUITY FOR AI WORK</div>
+      <div style="font-size:13px;color:var(--text2);max-width:500px;margin-bottom:12px;line-height:1.5">Stop restarting AI conversations. ChatLinx turns messy interactions into structured, reusable context — across any AI platform.</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-prime" onclick="openModal('new-task')">Start First Task</button>
+        <button class="btn btn-ghost" onclick="openHelp()">How it works</button>
+      </div>
+    </div>
+
+    <div class="vhead">
+      <div class="vhead-row">
+        <div class="vhead-title">TASKS</div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-ghost" onclick="openModal('new-task')">+ New Task</button>
+        </div>
+      </div>
+      <div class="vhead-sub">Work by task. Not by broken conversations.</div>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div class="empty-state" id="tasks-empty">
+      <div class="empty-icon">▦</div>
+      <div class="empty-title">NO TASKS YET</div>
+      <div class="empty-sub">Create your first task — dump your messy thinking here. ChatLinx will turn it into clarity.</div>
+      <button class="btn btn-prime btn-lg" onclick="openModal('new-task')">+ Create First Task</button>
+      <div style="margin-top:32px;width:100%;max-width:420px">
+        <div class="sec-label" style="text-align:center;margin-bottom:16px">The loop</div>
+        <div class="step-flow">
+          <div class="step-node"><div class="step-num active">1</div><div class="step-label active">Create task</div></div>
+          <div class="step-arrow"></div>
+          <div class="step-node"><div class="step-num">2</div><div class="step-label">Run Distil</div></div>
+          <div class="step-arrow"></div>
+          <div class="step-node"><div class="step-num">3</div><div class="step-label">Get clarity</div></div>
+          <div class="step-arrow"></div>
+          <div class="step-node"><div class="step-num">4</div><div class="step-label">Copy pack</div></div>
+          <div class="step-arrow"></div>
+          <div class="step-node"><div class="step-num">5</div><div class="step-label">Continue in AI</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TASK LIST -->
+    <div class="vbody" id="tasks-body" style="display:none">
+      <div class="filter-row" id="task-filters">
+        <button class="fchip on" onclick="filterChips(this,'all')">All</button>
+        <button class="fchip" onclick="filterChips(this,'active')">Active</button>
+        <button class="fchip" onclick="filterChips(this,'todo')">To do</button>
+        <button class="fchip" onclick="filterChips(this,'done')">Done</button>
+      </div>
+      <div class="task-list" id="task-list-el"></div>
+    </div>
+  </div>
+
+  <!-- ── DISTIL VIEW ── -->
+  <div class="view" id="view-distil">
+    <div class="vhead">
+      <div class="vhead-row">
+        <div class="vhead-title">DISTIL ENGINE</div>
+        <button class="distil-btn" onclick="runDistil()"><span>⚡</span> Run Distil</button>
+      </div>
+      <div class="vhead-sub">Turns messy thinking into structured continuity. Strips repetition, dead paths and fluff.</div>
+    </div>
+    <div class="vbody">
+
+      <!-- No distil yet -->
+      <div id="distil-empty">
+        <div class="distil-hero">
+          <div class="dh-eyebrow">Core Engine</div>
+          <div class="dh-title">DISTIL YOUR WORK</div>
+          <div class="dh-sub">Add tasks with your messy, unstructured thinking.<br>Distil turns it into: current state · decisions · open items · next actions.</div>
+          <button class="btn btn-prime btn-lg" onclick="runDistil()" style="margin:0 auto;display:flex">⚡ Run Distil Now</button>
+        </div>
+      </div>
+
+      <!-- Distil output -->
+      <div id="distil-output" style="display:none">
+        <div class="distil-grid" id="distil-panels"></div>
+        <div class="distil-cta">
+          <div class="dca-text"><strong>Continuity active.</strong> Copy pack → paste into AI → paste response back → Distil again. No resets. No context loss.</div>
+          <button class="btn btn-prime" onclick="go('context',null)">⬡ View Context Pack →</button>
+        </div>
+        <div style="font-size:11px;color:var(--text3);text-align:center;padding:4px 0">
+          Paste into AI → then paste the response back here to keep continuity alive &nbsp;·&nbsp; <span style="font-style:italic">Heuristic extraction — not AI interpretation</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CONTEXT PACK VIEW ── -->
+  <div class="view" id="view-context">
+    <div class="vhead">
+      <div class="vhead-row">
+        <div class="vhead-title">CONTEXT PACK</div>
+      </div>
+      <div class="vhead-sub">Paste into any AI. Continue instantly — no re-explaining, no restarting.</div>
+    </div>
+    <div class="vbody">
+
+      <!-- No pack yet -->
+      <div id="context-empty">
+        <div class="distil-hero">
+          <div class="dh-eyebrow">Output Layer</div>
+          <div class="dh-title">NO PACK YET</div>
+          <div class="dh-sub">Create tasks, run Distil, then your Context Pack will appear here — ready to copy into any AI.</div>
+          <button class="btn btn-ghost" onclick="go('tasks',null)" style="margin:0 auto;display:flex">← Add Tasks First</button>
+        </div>
+      </div>
+
+      <!-- Pack output -->
+      <div id="context-output" style="display:none">
+        <div class="pack-hero">
+          <div class="ph-head">
+            <div class="ph-icon">⬡</div>
+            <div class="ph-info">
+              <div class="ph-title" id="pack-project-title">CONTEXT PACK</div>
+              <div class="ph-sub" id="pack-meta">Auto-built from Distil · ready to copy</div>
+            </div>
+          </div>
+          <div class="pack-body" id="pack-rows"></div>
+          <div class="pack-footer">
+            <div class="pf-hint">Paste at the start of any new AI session</div>
+            <div class="copy-row">
+              <button class="btn btn-ghost" onclick="copyPack('minimal')">⎘ Minimal</button>
+              <button class="btn btn-prime" onclick="copyPack('full')">⎘ Copy Full Pack</button>
+              <button class="btn btn-ghost" onclick="openModal('paste-ai')" style="border-color:rgba(232,164,74,.3);color:var(--amber)">↩ Paste AI</button>
+            </div>
+          </div>
+        </div>
+        <div class="sec-row"><div class="sec-label">Raw text — paste directly</div></div>
+        <div class="pack-raw" id="pack-raw-text"></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<!-- ══ MODALS ══ -->
+<div class="overlay" id="overlay" onclick="closeOverlay(event)">
+
+  <!-- NEW TASK — minimal friction -->
+  <div class="modal" id="modal-new-task" style="display:none">
+    <div class="modal-head">
+      <div class="modal-title">+ NEW TASK</div>
+      <button class="modal-close" onclick="closeAllModals()">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Task name</label>
+      <input class="form-input" id="input-task-name" type="text" placeholder="e.g. Draft product brief, Research competitors, Build landing page" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label class="form-label">What's the current situation? Dump it here — messy is fine</label>
+      <textarea class="form-textarea" id="input-task-state" style="min-height:110px" placeholder="What's been decided? What's unclear? What happened in the last session? Don't structure it — that's Distil's job."></textarea>
+      <div class="form-hint">Be messy. ChatLinx will extract the structure.</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+      <button class="btn btn-prime" onclick="saveTask()">Create Task</button>
+    </div>
+  </div>
+
+  <!-- PASTE AI RESPONSE -->
+  <div class="modal" id="modal-paste-ai" style="display:none">
+    <div class="modal-head">
+      <div class="modal-title">↩ PASTE AI RESPONSE</div>
+      <button class="modal-close" onclick="closeAllModals()">✕</button>
+    </div>
+    <div id="paste-ai-focus-banner" style="display:none;background:var(--green-dark);border:1px solid var(--green-dim);border-radius:var(--r);padding:8px 11px;margin-bottom:13px;font-size:12px;color:var(--green);align-items:center;gap:7px">
+      <span>⬡</span>
+      <span>Attaching to: <strong id="paste-focus-name" style="color:var(--text)"></strong></span>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Paste response from Claude / ChatGPT / Gemini</label>
+      <textarea class="form-textarea" id="input-ai-response" style="min-height:130px" placeholder="Paste the AI response here..."></textarea>
+      <div class="form-hint">Auto-merges into your active task. Distil runs immediately.</div>
+    </div>
+    <div class="form-group" id="paste-task-override-group">
+      <label class="form-label" style="display:flex;align-items:center;justify-content:space-between">
+        <span>Override task</span>
+        <span style="font-size:10px;color:var(--text3);font-style:italic;font-weight:400">optional</span>
+      </label>
+      <select class="form-select" id="input-ai-task"></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+      <button class="btn btn-prime" onclick="ingestAI()">Merge &amp; Distil</button>
+    </div>
+  </div>
+  <div class="modal" id="modal-edit-task" style="display:none">
+    <div class="modal-head">
+      <div class="modal-title">EDIT TASK</div>
+      <button class="modal-close" onclick="closeAllModals()">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Task name</label>
+      <input class="form-input" id="edit-task-name" type="text">
+    </div>
+    <div class="form-group">
+      <label class="form-label">State reference</label>
+      <textarea class="form-textarea" id="edit-task-state"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Project</label>
+      <select class="form-select" id="edit-task-proj">
+        <option value="General">General</option>
+        <option value="Work">Work</option>
+        <option value="Research">Research</option>
+        <option value="Build">Build</option>
+        <option value="Strategy">Strategy</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Assigned AI</label>
+      <select class="form-select" id="edit-task-ai">
+        <option value="">— Unassigned —</option>
+        <option value="Claude">Claude</option>
+        <option value="ChatGPT">ChatGPT</option>
+        <option value="Gemini">Gemini</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select class="form-select" id="edit-task-status">
+        <option value="todo">To do</option>
+        <option value="active">Active</option>
+        <option value="done">Done</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" style="color:#d46b52;border-color:rgba(212,107,82,.3)" onclick="deleteTask()">Delete</button>
+      <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+      <button class="btn btn-prime" onclick="updateTask()">Save Changes</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span class="toast-icon">✓</span><span id="toast-msg"></span></div>
+
+<!-- ══ ONBOARDING — first run only ══ -->
+<div class="onboard-overlay" id="onboarding" style="display:none">
+  <div class="onboard-modal">
+    <div class="onboard-hero">
+      <div class="onboard-gem">
+        <svg viewBox="0 0 22 22" fill="none"><path d="M11 2L19 6.5V15.5L11 20L3 15.5V6.5L11 2Z" stroke="#52c46a" stroke-width="1.2" fill="rgba(82,196,106,.12)"/><path d="M11 2V20M3 6.5L19 15.5M19 6.5L3 15.5" stroke="#52c46a" stroke-width=".6" opacity=".5"/></svg>
+      </div>
+      <div class="onboard-title">CHAT<em>LINX</em></div>
+      <div class="onboard-tagline">Pick up any AI conversation instantly</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:3px">First IA built on the vDig-Forge platform</div>
+    </div>
+    <div class="onboard-body">
+      <div class="help-h2" style="text-align:center;margin-bottom:14px">The loop — this is everything</div>
+      <div class="onboard-loop">
+        <div class="ol-step"><div class="ol-num">1</div><div class="ol-label">Create task</div></div>
+        <div class="ol-arrow"></div>
+        <div class="ol-step"><div class="ol-num">2</div><div class="ol-label">Run Distil</div></div>
+        <div class="ol-arrow"></div>
+        <div class="ol-step"><div class="ol-num">3</div><div class="ol-label">Copy pack</div></div>
+        <div class="ol-arrow"></div>
+        <div class="ol-step"><div class="ol-num">4</div><div class="ol-label">Paste into AI</div></div>
+        <div class="ol-arrow"></div>
+        <div class="ol-step"><div class="ol-num">5</div><div class="ol-label">Paste back</div></div>
+      </div>
+      <div class="help-h2">Three rules</div>
+      <div class="onboard-rules">
+        <div class="onboard-rule"><div class="onboard-rule-dot"></div>Dump messy thinking into tasks — don't structure it, Distil does that</div>
+        <div class="onboard-rule"><div class="onboard-rule-dot"></div>Always use the Context Pack when starting a new AI session</div>
+        <div class="onboard-rule"><div class="onboard-rule-dot"></div>Always paste AI responses back — that's what keeps the loop alive</div>
+      </div>
+      <div class="help-warning">Your data is stored locally in your browser only. Nothing is sent to any server. Clearing browser storage will clear ChatLinx data.</div>
+      <button class="btn btn-prime" style="width:100%;justify-content:center;display:flex;padding:10px;font-size:13px;margin-top:4px" onclick="dismissOnboarding()">Get Started →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HELP MODAL ══ -->
+<div class="overlay" id="overlay-help" onclick="closeHelp(event)" style="opacity:0;pointer-events:none;transition:opacity .18s">
+  <div class="modal" style="width:520px;padding:0;overflow:hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px 0">
+      <div style="font-family:var(--display);font-size:16px;letter-spacing:2px;color:var(--green)">CHATLINX GUIDE</div>
+      <button class="modal-close" onclick="closeHelp(null)">✕</button>
+    </div>
+    <div class="help-tabs">
+      <button class="htab on" onclick="showHelpTab('quickstart',this)">Quick Start</button>
+      <button class="htab" onclick="showHelpTab('terms',this)">Terms</button>
+      <button class="htab" onclick="showHelpTab('privacy',this)">Privacy</button>
+    </div>
+
+    <!-- QUICK START -->
+    <div class="help-pane on" id="help-quickstart">
+      <div class="help-h1">Quick Start Guide</div>
+      <div class="help-p">ChatLinx lets you continue any AI conversation without restarting or re-explaining. It turns messy thinking into structured, reusable context and keeps it moving forward.</div>
+      <div class="help-h2">The Loop</div>
+      <div class="help-step"><div class="help-step-n">1</div><div><strong>Create a task</strong> — add a name and dump your current thinking. Messy is fine. Don't structure it.</div></div>
+      <div class="help-step"><div class="help-step-n">2</div><div><strong>Run Distil ⚡</strong> — extracts current state, decisions, open items and next actions automatically.</div></div>
+      <div class="help-step"><div class="help-step-n">3</div><div><strong>Copy Context Pack</strong> — click Copy Full Pack. This is your structured brief, ready to paste.</div></div>
+      <div class="help-step"><div class="help-step-n">4</div><div><strong>Paste into any AI</strong> — Claude, ChatGPT, Gemini. The AI now understands everything instantly. Ask for next steps — do not re-explain.</div></div>
+      <div class="help-step"><div class="help-step-n">5</div><div><strong>Paste the response back ↩</strong> — click Paste AI, paste the response. It merges automatically into your task. Distil re-runs. Loop continues.</div></div>
+      <div class="help-h2">Key Rules</div>
+      <div class="help-rule"><div class="help-rule-dot"></div>Do not rewrite context manually — always use the Context Pack</div>
+      <div class="help-rule"><div class="help-rule-dot"></div>Always paste AI responses back — this is what prevents context loss</div>
+      <div class="help-rule"><div class="help-rule-dot"></div>Press <strong>N</strong> anywhere to create a new task instantly</div>
+      <div class="help-h2">What Makes It Work</div>
+      <div class="help-rule"><div class="help-rule-dot"></div>Tasks hold state — not chat threads</div>
+      <div class="help-rule"><div class="help-rule-dot"></div>Distil creates clarity from mess</div>
+      <div class="help-rule"><div class="help-rule-dot"></div>Context Pack transfers intelligence to any AI</div>
+      <div class="help-rule"><div class="help-rule-dot"></div>The loop maintains continuity indefinitely</div>
+      <div class="help-warning" style="margin-top:14px">ChatLinx does not execute AI calls. It prepares, structures and manages your AI workflow. You interact directly with your chosen AI platform.</div>
+    </div>
+
+    <!-- TERMS -->
+    <div class="help-pane" id="help-terms">
+      <div class="help-h1">Terms of Use</div>
+      <div class="help-h2">1. Nature of Service</div>
+      <div class="help-p">ChatLinx is a local, browser-based continuity tool designed to help organise and continue AI-assisted workflows. It does not provide AI responses itself and is not affiliated with any AI provider.</div>
+      <div class="help-h2">2. User Responsibility</div>
+      <div class="help-p">Users are responsible for any content entered into the system and any actions taken based on AI outputs. ChatLinx does not verify, validate or endorse AI responses.</div>
+      <div class="help-h2">3. Data Storage</div>
+      <div class="help-p">All task data is stored locally in your browser using localStorage. No data is transmitted to external servers by ChatLinx. Data entered into external AI platforms is subject to those platforms' own terms.</div>
+      <div class="help-h2">4. No Guarantees</div>
+      <div class="help-p">ChatLinx is provided "as is" with no guarantee of accuracy, availability or fitness for any particular purpose. No liability is accepted for outcomes arising from its use.</div>
+      <div class="help-h2">5. Acceptable Use</div>
+      <div class="help-p">You agree not to use ChatLinx for illegal activity, harmful or abusive content, or misuse of AI-generated outputs.</div>
+      <div class="help-h2">6. Changes</div>
+      <div class="help-p">Features and behaviour may change without notice as the product evolves. Continued use constitutes acceptance of any changes.</div>
+      <div class="help-warning">ChatLinx Standard — built by Vesiron Tech Ltd. Part of the AppWow Evosystem.<br>Built with <strong>vDig-Forge</strong> — the Vesiron Digital Instant App framework.</div>
+    </div>
+
+    <!-- PRIVACY -->
+    <div class="help-pane" id="help-privacy">
+      <div class="help-h1">Privacy Summary</div>
+      <div class="help-h2">Local-First Design</div>
+      <div class="help-p">ChatLinx stores all data locally in your browser. Tasks, context, state references and AI responses are held in localStorage on your device only.</div>
+      <div class="help-rule"><div class="help-rule-dot"></div>No data is sent to ChatLinx servers</div>
+      <div class="help-rule"><div class="help-rule-dot"></div>No accounts or registration required</div>
+      <div class="help-rule"><div class="help-rule-dot"></div>No cookies beyond functional storage</div>
+      <div class="help-h2">No Tracking</div>
+      <div class="help-p">ChatLinx does not track user behaviour, store analytics, or share data with third parties.</div>
+      <div class="help-h2">External AI Platforms</div>
+      <div class="help-p">When you copy a Context Pack and paste it into an external AI platform (Claude, ChatGPT, Gemini etc.), that platform's own privacy policy applies. ChatLinx has no control over or responsibility for external platforms.</div>
+      <div class="help-h2">Data Loss</div>
+      <div class="help-p">Clearing your browser storage will remove all ChatLinx data permanently. Users are responsible for any backups required.</div>
+      <div class="help-warning">ChatLinx does not process, store or transmit personal data. All information remains on your device.</div>
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+        <div class="help-h2" style="margin-bottom:8px">Reset</div>
+        <div class="help-p" style="margin-bottom:10px">Clear all ChatLinx data from this browser. This cannot be undone.</div>
+        <button class="btn btn-ghost" style="color:#d46b52;border-color:rgba(212,107,82,.3);font-size:12px" onclick="clearAllData()">⊘ Clear all local data</button>
+      </div><!-- end reset section -->
+    </div><!-- end help-privacy -->
+  </div><!-- end modal -->
+</div><!-- end overlay-help -->
+
+<script>
+// ── STATE ──
+let tasks = JSON.parse(localStorage.getItem('cl_tasks') || '[]');
+let distilResult = JSON.parse(localStorage.getItem('cl_distil') || 'null');
+let editingId = null;
+let currentFilter = 'all';
+let currentProjFilter = null;
+
+// Storage availability check — catches Safari private mode + strict browsers
+let storageAvailable = true;
+try {
+  localStorage.setItem('__cl_test', '1');
+  localStorage.removeItem('__cl_test');
+} catch(e) {
+  storageAvailable = false;
+}
+
+const PROJ_COLORS = { General:'#8faa92', Work:'#52c46a', Research:'#4a9fd4', Build:'#e8a44a', Strategy:'#9b7fd4', Other:'#6a8070' };
+
+// ── ROUTING ──
+function go(view, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
+  document.getElementById('view-' + view).classList.add('on');
+  document.querySelectorAll('.tnav').forEach(b => b.classList.remove('on'));
+  if (btn) btn.classList.add('on');
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('on'));
+  const sbEl = document.getElementById('sb-' + view);
+  if (sbEl) sbEl.classList.add('on');
+  renderView(view);
+}
+
+function renderView(view) {
+  if (view === 'tasks') renderTasks();
+  if (view === 'distil') renderDistil();
+  if (view === 'context') renderContext();
+}
+
+// ── TASKS ──
+function renderTasks() {
+  const filtered = getFilteredTasks();
+  const empty = document.getElementById('tasks-empty');
+  const body = document.getElementById('tasks-body');
+  const heroEl = document.getElementById('tasks-hero');
+  if (tasks.length === 0) {
+    empty.style.display = 'flex'; body.style.display = 'none';
+    if (heroEl) heroEl.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none'; body.style.display = 'flex';
+  if (heroEl) heroEl.style.display = 'none';
+  const list = document.getElementById('task-list-el');
+  list.innerHTML = '';
+  filtered.forEach(t => {
+    const el = document.createElement('div');
+    el.className = 'task-card' + (t.status === 'done' ? ' done' : '') + (t.status === 'active' ? ' on' : '');
+    el.innerHTML = `
+      <div class="tc-top">
+        <div class="tc-name">${esc(t.name)}</div>
+        ${t.status === 'done' ? '<div class="tc-done-check">✓</div>' : ''}
+      </div>
+      <div class="tc-meta" style="margin-bottom:6px">
+        <span class="tc-proj" style="background:${PROJ_COLORS[t.project]||'#4d6650'}22;color:${PROJ_COLORS[t.project]||'#8faa92'}">${esc(t.project)}</span>
+        ${t.ai ? `<span class="tc-ai ${t.ai==='Claude'?'ai-claude':t.ai==='ChatGPT'?'ai-gpt':'ai-any'}">● ${esc(t.ai)}</span>` : ''}
+        <span class="status-chip ${t.status==='active'?'chip-active':t.status==='done'?'chip-done':'chip-todo'}">${t.status}</span>
+      </div>
+      ${t.state ? `<div class="tc-state">${esc(t.state.slice(0,120))}${t.state.length>120?'…':''}</div>` : ''}
+      <div class="task-actions">
+        <button class="icon-btn" title="Edit" onclick="editTask('${t.id}')">✎</button>
+        <button class="icon-btn" title="${t.status==='active'?'Mark done':'Mark active'}" onclick="toggleStatus('${t.id}')">${t.status==='done'?'↺':'✓'}</button>
+      </div>`;
+    list.appendChild(el);
+  });
+  updateCounts();
+}
+
+function getFilteredTasks() {
+  return tasks
+    .filter(t => {
+      const statusOk = currentFilter === 'all' || t.status === currentFilter;
+      const projOk = !currentProjFilter || t.project === currentProjFilter;
+      return statusOk && projOk;
+    })
+    .sort((a,b) => (b.updated||b.created) - (a.updated||a.created));
+}
+
+function filterChips(btn, val) {
+  document.querySelectorAll('#task-filters .fchip').forEach(c => c.classList.remove('on'));
+  btn.classList.add('on');
+  currentFilter = val;
+  renderTasks();
+}
+
+function filterProj(proj) {
+  currentProjFilter = currentProjFilter === proj ? null : proj;
+  go('tasks', null);
+}
+
+function updateCounts() {
+  document.getElementById('sb-task-count').textContent = tasks.filter(t => t.status !== 'done').length;
+  document.getElementById('sb-sl').textContent = tasks.filter(t => t.project === 'Work').length;
+  document.getElementById('sb-ml').textContent = tasks.filter(t => t.project === 'Research').length;
+  document.getElementById('sb-aw').textContent = tasks.filter(t => t.project === 'Build').length;
+  document.getElementById('sb-se').textContent = tasks.filter(t => t.project === 'Strategy').length;
+  document.getElementById('sb-distil-count').textContent = distilResult ? '✓' : '—';
+}
+
+function saveTask() {
+  const name = document.getElementById('input-task-name').value.trim();
+  const state = document.getElementById('input-task-state').value.trim();
+  if (!name) { showToast('Please add a task name'); return; }
+  // Defaults silently — project = General, ai = unassigned, editable later
+  const proj = 'General';
+  tasks.push({ id: uid(), name, state, project: proj, ai: '', status: 'active', created: Date.now() });
+  persist();
+  closeAllModals();
+  document.getElementById('input-task-name').value = '';
+  document.getElementById('input-task-state').value = '';
+  document.querySelector('.distil-btn').classList.add('pulse');
+  showToast('Task created — run ⚡ Distil to extract clarity');
+  go('tasks', null);
+}
+
+function editTask(id) {
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  editingId = id;
+  document.getElementById('edit-task-name').value = t.name;
+  document.getElementById('edit-task-state').value = t.state || '';
+  document.getElementById('edit-task-proj').value = t.project;
+  document.getElementById('edit-task-ai').value = t.ai || '';
+  document.getElementById('edit-task-status').value = t.status;
+  openModal('edit-task');
+}
+
+function updateTask() {
+  const t = tasks.find(x => x.id === editingId);
+  if (!t) return;
+  t.name = document.getElementById('edit-task-name').value.trim();
+  t.state = document.getElementById('edit-task-state').value.trim();
+  t.project = document.getElementById('edit-task-proj').value;
+  t.ai = document.getElementById('edit-task-ai').value;
+  t.status = document.getElementById('edit-task-status').value;
+  persist();
+  closeAllModals();
+  showToast('Task updated');
+  renderTasks();
+}
+
+function deleteTask() {
+  if (!confirm('Delete this task?')) return;
+  tasks = tasks.filter(x => x.id !== editingId);
+  persist();
+  closeAllModals();
+  showToast('Task deleted');
+  renderTasks();
+}
+
+function toggleStatus(id) {
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+  t.status = t.status === 'done' ? 'active' : 'done';
+  persist();
+  renderTasks();
+}
+
+// ── DISTIL ──
+function runDistil() {
+  if (tasks.length === 0) { showToast('Add at least one task first'); go('tasks', null); return; }
+  distilResult = buildDistil();
+  persistDistil();
+  updateCounts();
+  go('distil', null);
+  showToast('Distil complete — context pack updated');
+  document.querySelector('.distil-btn').classList.remove('pulse');
+}
+
+function buildDistil() {
+  const active = tasks.filter(t => t.status !== 'done');
+  const done = tasks.filter(t => t.status === 'done');
+  const decisions = [];
+  const open = [];
+  const next = [];
+  const stateFragments = [];
+  const proj = mostCommonProject();
+
+  // Active task focus — most recently updated active task (spread to avoid mutation)
+  const focusTask = [...active].sort((a,b) => (b.updated||b.created) - (a.updated||a.created))[0];
+
+  active.filter(t => t.name || t.state).forEach(t => {
+    const s = (t.state || '').toLowerCase();
+    if (!s) { next.push({ text: t.name, ai: t.ai }); return; }
+
+    if (s.match(/\b(decided|confirmed|locked|agreed|finalised|finalized|complete|done|resolved|shipped)\b/)) {
+      decisions.push({ text: t.name + (t.state ? ' — ' + t.state.slice(0, 90) : ''), ai: t.ai });
+    } else if (s.match(/\b(unclear|pending|tbd|unknown|issue|blocker|not yet|unresolved|undecided|waiting|\?)\b/) || s.includes('?')) {
+      open.push({ text: t.name, ai: t.ai });
+    } else if (s.match(/\b(todo|next|need to|needs to|should|action|will|going to|plan to|build|create|write|implement)\b/)) {
+      next.push({ text: t.name, ai: t.ai });
+    } else {
+      stateFragments.push(t.state.slice(0, 100));
+    }
+  });
+
+  const baseState = active.length > 0
+    ? `${active.length} active task${active.length > 1 ? 's' : ''} in ${proj}. ${done.length} completed.`
+    : `All tasks complete in ${proj}.`;
+
+  const state = stateFragments.length
+    ? baseState + ' ' + stateFragments.join('. ')
+    : baseState;
+
+  return {
+    state,
+    decisions,
+    open,
+    next,
+    done: done.map(t => t.name),
+    proj,
+    focusTask: focusTask ? focusTask.name : null,
+    ts: Date.now()
+  };
+}
+
+function mostCommonProject() {
+  const counts = {};
+  tasks.forEach(t => { counts[t.project] = (counts[t.project] || 0) + 1; });
+  return Object.entries(counts).sort((a,b) => b[1]-a[1])[0]?.[0] || 'Project';
+}
+
+function renderDistil() {
+  if (!distilResult) { document.getElementById('distil-empty').style.display = 'block'; document.getElementById('distil-output').style.display = 'none'; return; }
+  document.getElementById('distil-empty').style.display = 'none';
+  document.getElementById('distil-output').style.display = 'flex';
+  document.getElementById('distil-output').style.flexDirection = 'column';
+  document.getElementById('distil-output').style.gap = '12px';
+  const d = distilResult;
+  const panels = [
+    { title: 'Active Task', count: d.focusTask ? '1' : '0', items: d.focusTask ? [{ dot:'dot-green', text: d.focusTask }] : [], type: 'focus' },
+    { title: 'Current State', count: '1', items: [{ dot:'dot-blue', text: d.state }], type: 'state' },
+    { title: 'Key Decisions', count: d.decisions.length, items: d.decisions.map(x => ({ dot:'dot-green', text: x.text + (x.ai ? ' · ' + x.ai : '') })), type: 'decisions' },
+    { title: 'Open Items', count: d.open.length, items: d.open.map(x => ({ dot:'dot-amber', text: x.text + (x.ai ? ' · ' + x.ai : '') })), type: 'open' },
+    { title: 'Next Actions', count: d.next.length, items: d.next.map(x => ({ dot:'dot-green', text: x.text + (x.ai ? ' → ' + x.ai : '') })), type: 'next' }
+  ];
+  document.getElementById('distil-panels').innerHTML = panels.map(p => `
+    <div class="distil-panel">
+      <div class="dp-head"><div class="dp-title">${p.title}</div><div class="dp-count">${p.count}</div></div>
+      <div class="dp-body">
+        ${p.items.length ? p.items.map(i => `<div class="dp-item"><div class="dp-dot ${i.dot}"></div><div>${esc(i.text)}</div></div>`).join('') : '<div class="dp-empty">Nothing here yet</div>'}
+        ${p.type==='decisions' && d.done.length ? d.done.slice(0,2).map(n=>`<div class="dp-item"><div class="dp-dot dot-dead"></div><div class="dp-dead">${esc(n)} — complete</div></div>`).join('') : ''}
+      </div>
+    </div>`).join('');
+}
+
+// ── CONTEXT PACK ──
+function renderContext() {
+  if (!distilResult) { document.getElementById('context-empty').style.display = 'block'; document.getElementById('context-output').style.display = 'none'; return; }
+  document.getElementById('context-empty').style.display = 'none';
+  document.getElementById('context-output').style.display = 'flex';
+  document.getElementById('context-output').style.flexDirection = 'column';
+  document.getElementById('context-output').style.gap = '14px';
+  const d = distilResult;
+  const proj = d.proj;
+  document.getElementById('pack-project-title').textContent = 'CONTEXT PACK — ' + proj.toUpperCase();
+  document.getElementById('pack-meta').textContent = `Auto-built from Distil · ${tasks.filter(t=>t.status!=='done').length} active tasks · ${new Date(d.ts).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`;
+  const rows = [];
+  if (d.focusTask) rows.push({ check: true, text: 'Active task: ' + d.focusTask, source: 'focus' });
+  rows.push({ check: true, text: 'Project: ' + proj, source: 'workspace' });
+  rows.push({ check: true, text: 'Current state: ' + d.state, source: 'distil' });
+  if (d.decisions.length) rows.push({ check: true, text: 'Decisions: ' + d.decisions.map(x=>x.text).join(' · '), source: 'distil' });
+  if (d.open.length) rows.push({ check: true, text: 'Open items: ' + d.open.map(x=>x.text).join(' · '), source: 'distil' });
+  if (d.next.length) rows.push({ check: true, text: 'Next actions: ' + d.next.map(x=>x.text).join(' · '), source: 'distil' });
+  rows.push({ check: true, text: 'Role: I am an innovator not a developer — engineering terminology, no deep code explanations.', source: 'prefs' });
+  document.getElementById('pack-rows').innerHTML = rows.map(r => `
+    <div class="pack-row">
+      <div class="pr-check">✓</div>
+      <div class="pr-text">${esc(r.text)}</div>
+      <div class="pr-source">${r.source}</div>
+    </div>`).join('');
+  document.getElementById('pack-raw-text').textContent = buildRawPack('full');
+}
+
+function buildRawPack(mode) {
+  if (!distilResult) return '';
+  const d = distilResult;
+  let out = `--- CHATLINX CONTEXT PACK ---\n`;
+  out += `Project: ${d.proj}\n`;
+  out += `Generated: ${new Date(d.ts).toISOString()} · v${CL_VERSION}\n\n`;
+  out += `CURRENT STATE\n${d.state}\n\n`;
+  if (d.decisions.length && mode === 'full') {
+    out += `KEY DECISIONS\n`;
+    d.decisions.forEach(x => { out += `• ${x.text}\n`; });
+    out += '\n';
+  }
+  if (d.open.length) {
+    out += `OPEN ITEMS\n`;
+    d.open.forEach(x => { out += `• ${x.text}\n`; });
+    out += '\n';
+  }
+  if (d.next.length) {
+    out += `NEXT ACTIONS\n`;
+    d.next.forEach(x => { out += `• ${x.text}${x.ai ? ' → ' + x.ai : ''}\n`; });
+    out += '\n';
+  }
+  out += `CONTEXT\nI am an innovator not a developer. Use engineering terminology. No deep code explanations.\n\n`;
+  if (d.focusTask) out += `ACTIVE TASK\n${d.focusTask}\n\n`;
+  out += `INSTRUCTION\nContinue execution from NEXT ACTIONS.\nDo not repeat context. Do not restate. Proceed directly.\n\n`;
+  out += `--- CONTINUE FROM WHERE WE LEFT OFF ---`;
+  return out;
+}
+
+function copyPack(mode) {
+  const text = buildRawPack(mode);
+  if (!text) { showToast('Run Distil first'); return; }
+  navigator.clipboard.writeText(text).then(() => {
+    const msg = mode === 'minimal'
+      ? 'Minimal pack copied — paste into your AI, then come back and update your task'
+      : 'Full pack copied — paste into your AI, then come back and paste the response';
+    showToast(msg);
+  }).catch(() => {
+    showToast('Select and copy the raw text block below');
+  });
+}
+
+// ── AI RESPONSE LOOP ──
+function populateAITaskSelect() {
+  const active = tasks.filter(t => t.status !== 'done');
+  const focusTask = [...active].sort((a,b) => (b.updated||b.created) - (a.updated||a.created))[0];
+  const sel = document.getElementById('input-ai-task');
+  const banner = document.getElementById('paste-ai-focus-banner');
+  const focusName = document.getElementById('paste-focus-name');
+  const overrideGroup = document.getElementById('paste-task-override-group');
+  if (!sel) return;
+  sel.innerHTML = active.length
+    ? active.map(t => `<option value="${t.id}"${focusTask && t.id===focusTask.id?' selected':''}>${esc(t.name)}</option>`).join('')
+    : '<option value="">— No active tasks —</option>';
+  if (focusTask && banner && focusName) {
+    focusName.textContent = focusTask.name;
+    banner.style.display = 'flex';
+  }
+  if (overrideGroup) overrideGroup.style.display = active.length <= 1 ? 'none' : 'block';
+}
+
+function ingestAI() {
+  const text = document.getElementById('input-ai-response').value.trim();
+  if (!text) { showToast('Paste an AI response first'); return; }
+  const active = tasks.filter(t => t.status !== 'done');
+  const overrideId = document.getElementById('input-ai-task').value;
+  const task = overrideId
+    ? tasks.find(t => t.id === overrideId)
+    : [...active].sort((a,b) => (b.updated||b.created) - (a.updated||a.created))[0];
+  if (!task) { showToast('No active task found — create one first'); return; }
+  const separator = task.state ? '\n\n--- AI RESPONSE ---\n' : '';
+  let merged = (task.state || '') + separator + text;
+  // State size cap — prevent silent localStorage failure
+  if (merged.length > 5000) merged = merged.slice(-4000);
+  task.state = merged;
+  task.status = 'active';
+  task.updated = Date.now();
+  persist();
+  document.getElementById('input-ai-response').value = '';
+  closeAllModals();
+  distilResult = buildDistil();
+  persistDistil();
+  renderDistil();
+  updateCounts();
+  renderTasks();
+  showToast('Merged into "' + task.name.slice(0,32) + (task.name.length>32?'…':'') + '" — loop continues');
+  go('distil', null);
+}
+
+// ── UNLOAD WARNING ──
+window.addEventListener('beforeunload', e => {
+  const pasteOpen = document.getElementById('modal-paste-ai') &&
+    document.getElementById('modal-paste-ai').style.display !== 'none';
+  const pasteHasContent = document.getElementById('input-ai-response') &&
+    document.getElementById('input-ai-response').value.trim().length > 0;
+  if (pasteOpen && pasteHasContent) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+// ── MODAL ──
+function closeAllModals() {
+  document.getElementById('overlay').classList.remove('open');
+  setTimeout(() => document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'), 180);
+}
+function closeOverlay(e) { if (e.target === document.getElementById('overlay')) closeAllModals(); }
+
+// ── TOAST ──
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ── UTILS ──
+function uid() { return Math.random().toString(36).slice(2,10); }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function persist() {
+  if (!storageAvailable) { showToast('Storage unavailable — data will not persist in this browser'); return; }
+  try {
+    localStorage.setItem('cl_tasks', JSON.stringify(tasks));
+  } catch(err) {
+    showToast('Storage full — export your data or reduce task size');
+  }
+}
+function persistDistil() {
+  if (!storageAvailable) return;
+  try {
+    localStorage.setItem('cl_distil', JSON.stringify(distilResult));
+  } catch(err) {
+    showToast('Could not save Distil result — browser storage is full');
+  }
+}
+function exportData() {
+  if (!tasks.length && !distilResult) { showToast('Nothing to export yet'); return; }
+  const data = { tasks, distilResult, exported: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `chatlinx-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  showToast('Backup exported — keep it somewhere safe');
+}
+
+function clearAllData() {
+  if (!confirm('Clear all ChatLinx data from this browser? This cannot be undone.')) return;
+  localStorage.removeItem('cl_tasks');
+  localStorage.removeItem('cl_distil');
+  localStorage.removeItem('cl_onboarded');
+  tasks = [];
+  distilResult = null;
+  updateCounts();
+  renderTasks();
+  go('tasks', null);
+  showToast('All local ChatLinx data cleared');
+}
+
+// ── ONBOARDING ──
+function dismissOnboarding() {
+  document.getElementById('onboarding').style.display = 'none';
+  localStorage.setItem('cl_onboarded', '1');
+}
+
+// ── HELP MODAL ──
+function showHelpTab(tab, btn) {
+  document.querySelectorAll('.help-pane').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.htab').forEach(b => b.classList.remove('on'));
+  document.getElementById('help-' + tab).classList.add('on');
+  if (btn) btn.classList.add('on');
+}
+function openHelp() {
+  document.getElementById('overlay-help').style.opacity = '1';
+  document.getElementById('overlay-help').style.pointerEvents = 'all';
+}
+function closeHelp(e) {
+  if (e && e.target !== document.getElementById('overlay-help')) return;
+  document.getElementById('overlay-help').style.opacity = '0';
+  document.getElementById('overlay-help').style.pointerEvents = 'none';
+}
+
+// ── MODAL (updated to handle help) ──
+function openModal(name) {
+  if (name === 'help') { openHelp(); return; }
+  document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+  const m = document.getElementById('modal-' + name);
+  if (m) {
+    m.style.display = 'block';
+    document.getElementById('overlay').classList.add('open');
+    if (name === 'paste-ai') populateAITaskSelect();
+  }
+  setTimeout(() => { const f = m && m.querySelector('input, textarea'); if (f) f.focus(); }, 100);
+}
+
+// ── VERSION ──
+const CL_VERSION = '1.0.0';
+
+// ── INSTALL PROMPT ──
+let deferredInstall = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstall = e;
+  showToast('Install ChatLinx → tap "Install App" in the sidebar for offline access');
+  const installBtn = document.getElementById('sb-install-btn');
+  if (installBtn) installBtn.classList.add('pulse');
+});
+window.addEventListener('appinstalled', () => {
+  showToast('ChatLinx installed — available from your home screen');
+  deferredInstall = null;
+  const installBtn = document.getElementById('sb-install-btn');
+  if (installBtn) installBtn.classList.remove('pulse');
+});
+function triggerInstall() {
+  if (!deferredInstall) {
+    showToast('Install option not available on this browser — try Chrome or Edge on desktop/Android');
+    return;
+  }
+  deferredInstall.prompt();
+  deferredInstall.userChoice.finally(() => { deferredInstall = null; });
+}
+
+// ── KEYBOARD ──
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeAllModals(); closeHelp(null); }
+  if (e.key === 'n' && !e.target.matches('input,textarea,select')) openModal('new-task');
+});
+
+// ── INIT ──
+renderTasks();
+updateCounts();
+if (distilResult) document.getElementById('sb-distil-count').textContent = '✓';
+if (!localStorage.getItem('cl_onboarded')) document.getElementById('onboarding').style.display = 'flex';
+
+// ── SERVICE WORKER ──
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js')
+    .catch(() => {}); // silent fail in dev/iframe context
+}
+</script>
+</body>
+</html>
