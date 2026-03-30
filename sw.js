@@ -1,4 +1,4 @@
-const CACHE = 'chatlinx-v1';
+const CACHE = 'chatlinx-v2';
 const ASSETS = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', e => {
@@ -15,7 +15,16 @@ self.addEventListener('activate', e => {
 
 
 self.addEventListener('fetch', e => {
-  e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request))
-  );
+  const req = e.request;
+
+  // Only handle navigation (page loads)
+  if (req.mode === 'navigate') {
+    e.respondWith(
+      fetch(req).catch(() => caches.match('/index.html'))
+    );
+    return;
+  }
+
+  // Let all other requests (icons, images, etc.) go straight to network
+  e.respondWith(fetch(req));
 });
