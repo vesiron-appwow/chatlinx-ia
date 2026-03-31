@@ -5,10 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ChatLinx Continuator — Copy In. Continue Out.</title>
   <meta name="description" content="Paste your AI chat. Get a continuity block. Continue instantly — in any AI, anywhere." />
+  <meta name="theme-color" content="#0a0a0f" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="apple-mobile-web-app-title" content="ChatLinx Continuator" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icons/icon-192.png" />
   <link rel="icon" href="/icons/icon-192.png" />
-
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
@@ -44,43 +48,30 @@
 
     body::before {
       content: '';
-      position: fixed;
-      inset: 0;
+      position: fixed; inset: 0;
       background-image:
         linear-gradient(rgba(0,229,255,0.025) 1px, transparent 1px),
         linear-gradient(90deg, rgba(0,229,255,0.025) 1px, transparent 1px);
       background-size: 48px 48px;
-      pointer-events: none;
-      z-index: 0;
+      pointer-events: none; z-index: 0;
     }
 
-    .orb {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(130px);
-      pointer-events: none;
-      z-index: 0;
-    }
+    .orb { position: fixed; border-radius: 50%; filter: blur(130px); pointer-events: none; z-index: 0; }
     .orb-1 { width: 600px; height: 600px; background: rgba(0,229,255,0.055); top: -200px; right: -150px; }
     .orb-2 { width: 450px; height: 450px; background: rgba(255,107,53,0.045); bottom: 100px; left: -150px; }
     .orb-3 { width: 300px; height: 300px; background: rgba(123,97,255,0.04); top: 50%; left: 50%; transform: translate(-50%,-50%); }
 
-    /* NAV */
+    /* ── NAV ── */
     nav {
-      position: relative;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      position: relative; z-index: 10;
+      display: flex; align-items: center; justify-content: space-between;
       padding: 26px 40px;
       border-bottom: 1px solid var(--border);
     }
-
     .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
     .nav-logo img { width: 30px; height: 30px; border-radius: 7px; }
     .nav-logo-text { font-family: var(--display); font-size: 21px; letter-spacing: 0.05em; color: var(--text); }
     .nav-logo-text span { color: var(--accent); }
-
     .nav-right { display: flex; align-items: center; gap: 16px; }
     .nav-sub { font-family: var(--mono); font-size: 10px; color: var(--text-dim); letter-spacing: 0.12em; text-transform: uppercase; }
     .nav-badge {
@@ -89,43 +80,34 @@
       border-radius: 20px; letter-spacing: 0.1em; text-transform: uppercase;
     }
 
-    /* HERO */
+    /* ── HERO ── */
     .hero {
       padding: 96px 40px 60px;
-      max-width: 900px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
+      max-width: 900px; margin: 0 auto;
+      position: relative; z-index: 1;
     }
-
     .hero-eyebrow {
       font-family: var(--mono); font-size: 11px; letter-spacing: 0.22em;
       color: var(--accent); text-transform: uppercase; margin-bottom: 28px;
       display: flex; align-items: center; gap: 10px;
     }
     .hero-eyebrow::before { content: ''; display: block; width: 28px; height: 1px; background: var(--accent); }
-
     .hero-headline {
       font-family: var(--display);
       font-size: clamp(60px, 10vw, 116px);
-      line-height: 0.9;
-      color: var(--text);
-      margin-bottom: 32px;
+      line-height: 0.9; color: var(--text); margin-bottom: 32px;
     }
     .hero-headline .accent  { color: var(--accent); }
     .hero-headline .accent2 { color: var(--accent2); }
-
     .hero-sub {
       font-size: 18px; font-weight: 300; color: var(--text-dim);
       max-width: 500px; line-height: 1.75; margin-bottom: 16px;
     }
     .hero-sub strong { color: var(--text); font-weight: 500; }
-
     .hero-note {
       font-family: var(--mono); font-size: 12px; color: var(--muted);
       letter-spacing: 0.06em; margin-bottom: 48px;
     }
-
     .hero-actions { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
 
     .btn-primary {
@@ -133,7 +115,8 @@
       background: var(--accent); color: #000;
       font-family: var(--mono); font-size: 13px; font-weight: 500;
       letter-spacing: 0.09em; text-transform: uppercase;
-      padding: 15px 30px; border-radius: 4px; text-decoration: none;
+      padding: 15px 30px; border-radius: 4px;
+      text-decoration: none; border: none; cursor: pointer;
       transition: opacity 0.2s, transform 0.2s;
     }
     .btn-primary:hover { opacity: 0.85; transform: translateY(-2px); }
@@ -142,55 +125,136 @@
       display: inline-flex; align-items: center; gap: 8px;
       color: var(--text-dim); font-family: var(--mono); font-size: 12px;
       letter-spacing: 0.08em; text-transform: uppercase;
-      text-decoration: none; transition: color 0.2s;
+      text-decoration: none; background: none; border: none; cursor: pointer;
+      transition: color 0.2s;
     }
     .btn-ghost:hover { color: var(--text); }
     .btn-ghost svg { width: 14px; height: 14px; }
 
-    /* FUNNEL */
+    /* ── CONTINUATOR ENGINE (hidden by default) ── */
+    #continuator-engine {
+      display: none;
+      position: relative; z-index: 1;
+    }
+    #continuator-engine.active {
+      display: block;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .engine-wrap {
+      max-width: 900px; margin: 0 auto;
+      padding: 48px 40px 0;
+    }
+
+    .engine-section-label {
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em;
+      color: var(--muted); text-transform: uppercase;
+      margin-bottom: 32px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .engine-section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .engine-input-block {
+      background: var(--surface); border: 1px solid var(--border);
+      border-left: 3px solid var(--accent2); border-radius: 6px;
+      padding: 28px 32px; margin-bottom: 16px;
+    }
+
+    .engine-input-label {
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em;
+      color: var(--muted); text-transform: uppercase; margin-bottom: 14px;
+    }
+
+    #inputBox {
+      width: 100%; height: 200px;
+      background: var(--bg); color: var(--text);
+      border: 1px solid var(--border); border-radius: 4px;
+      padding: 16px; resize: vertical;
+      font-family: var(--mono); font-size: 13px; line-height: 1.7;
+      outline: none; transition: border-color 0.2s;
+    }
+    #inputBox::placeholder { color: var(--muted); }
+    #inputBox:focus { border-color: rgba(0,229,255,0.3); }
+
+    .engine-run-row {
+      display: flex; align-items: center; gap: 16px; margin-top: 16px; flex-wrap: wrap;
+    }
+    .engine-note {
+      font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.05em;
+    }
+
+    /* OUTPUT BLOCK */
+    .engine-output-block {
+      background: var(--surface); border: 1px solid var(--border);
+      border-left: 3px solid var(--accent); border-radius: 6px;
+      padding: 28px 32px; margin-bottom: 48px; position: relative;
+    }
+
+    .engine-output-label-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .engine-output-label {
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em;
+      color: var(--muted); text-transform: uppercase;
+    }
+
+    .copy-btn {
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 6px 14px; border-radius: 3px;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--text-dim); cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .copy-btn:hover  { color: var(--accent); border-color: rgba(0,229,255,0.4); }
+    .copy-btn.copied { color: var(--accent); border-color: rgba(0,229,255,0.4); }
+
+    #outputContent {
+      font-family: var(--mono); font-size: 13px; line-height: 1.85;
+      color: var(--text-dim); white-space: pre-wrap; min-height: 60px;
+    }
+
+    .engine-proof {
+      font-family: var(--mono); font-size: 11px; color: var(--muted);
+      margin-top: 14px; letter-spacing: 0.05em;
+    }
+    .engine-proof span { color: var(--accent); }
+
+    /* ── FUNNEL ── */
     .funnel {
       position: relative; z-index: 1;
       max-width: 900px; margin: 0 auto 80px; padding: 0 40px;
     }
-
     .funnel-inner {
       background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
     }
-
     .funnel-header {
       padding: 18px 28px; border-bottom: 1px solid var(--border);
       display: flex; align-items: center; justify-content: space-between;
     }
     .funnel-title { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; color: var(--muted); text-transform: uppercase; }
     .funnel-badge { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--accent2); text-transform: uppercase; }
-
     .funnel-steps {
       display: grid;
       grid-template-columns: 1fr auto 1fr auto 1fr;
       align-items: stretch;
     }
-
     .funnel-step { padding: 32px 28px; }
-    .funnel-step.user-step { border-left: 3px solid var(--accent); }
+    .funnel-step.user-step   { border-left: 3px solid var(--accent); }
     .funnel-step.output-step { border-left: 3px solid var(--accent2); }
-
     .funnel-arrow {
       display: flex; align-items: center; justify-content: center;
       padding: 0 10px; color: var(--muted); font-size: 20px;
       border-left: 1px solid var(--border); border-right: 1px solid var(--border);
     }
-
     .fs-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 10px; }
     .fs-label.in     { color: var(--accent); }
     .fs-label.engine { color: var(--muted); }
     .fs-label.out    { color: var(--accent2); }
-
     .fs-word { font-family: var(--display); font-size: 38px; letter-spacing: 0.02em; line-height: 1; margin-bottom: 12px; }
     .fs-word.in  { color: var(--accent); }
     .fs-word.out { color: var(--accent2); }
-
     .fs-desc { font-size: 13px; color: var(--text-dim); line-height: 1.65; }
-
     .engine-pills { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
     .engine-pill {
       display: flex; align-items: center; gap: 10px;
@@ -202,17 +266,15 @@
       border-radius: 50%; background: var(--accent3); flex-shrink: 0;
     }
 
-    /* DEMO BLOCK */
+    /* ── DEMO BLOCK (static example) ── */
     .demo-block {
       position: relative; z-index: 1;
       max-width: 900px; margin: 0 auto 80px; padding: 0 40px;
     }
-
     .demo-label {
       font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em;
       color: var(--muted); text-transform: uppercase; margin-bottom: 12px;
     }
-
     .context-pack {
       background: var(--surface); border: 1px solid var(--border);
       border-left: 3px solid var(--accent2); border-radius: 6px;
@@ -225,8 +287,7 @@
       background: linear-gradient(90deg, transparent, rgba(10,10,15,0.5));
       pointer-events: none;
     }
-
-    .copy-btn {
+    .demo-copy-btn {
       position: absolute; top: 12px; right: 12px;
       font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
       text-transform: uppercase; padding: 6px 14px;
@@ -234,55 +295,48 @@
       color: var(--text-dim); cursor: pointer; border-radius: 3px; z-index: 2;
       transition: color 0.2s, border-color 0.2s;
     }
-    .copy-btn:hover { color: var(--accent2); border-color: rgba(255,107,53,0.4); }
-    .copy-btn.copied { color: var(--accent2); border-color: rgba(255,107,53,0.4); }
-
+    .demo-copy-btn:hover  { color: var(--accent2); border-color: rgba(255,107,53,0.4); }
+    .demo-copy-btn.copied { color: var(--accent2); border-color: rgba(255,107,53,0.4); }
     .demo-proof {
       font-family: var(--mono); font-size: 11px; color: var(--muted);
       margin-top: 14px; letter-spacing: 0.05em;
     }
     .demo-proof span { color: var(--accent2); }
-
     .cp-header { color: var(--accent2); font-size: 11px; letter-spacing: 0.15em; margin-bottom: 18px; }
     .cp-section { margin-bottom: 16px; }
     .cp-section-label { color: var(--accent); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 4px; }
     .cp-section-body { color: var(--text); }
     .cp-bullet { color: var(--text-dim); }
     .cp-bullet::before { content: 'o  '; color: var(--accent2); }
-
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
     .cursor {
       display: inline-block; width: 2px; height: 0.9em;
       background: var(--accent2); margin-left: 3px;
       vertical-align: middle; animation: blink 1.1s step-end infinite;
     }
 
-    /* PROBLEM */
+    /* ── PROBLEM ── */
     .problem {
       position: relative; z-index: 1;
       padding: 60px 40px; max-width: 900px; margin: 0 auto;
     }
-
     .section-label {
       font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em;
       color: var(--muted); text-transform: uppercase; margin-bottom: 40px;
       display: flex; align-items: center; gap: 12px;
     }
     .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
     .problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
-
     .problem-card { padding: 36px 32px; background: var(--surface); border: 1px solid var(--border); }
     .problem-card:first-child { border-radius: 6px 0 0 6px; border-left: 3px solid #ff3b3b; }
     .problem-card:last-child  { border-radius: 0 6px 6px 0; border-left: 3px solid var(--accent); }
-
     .pc-icon { font-size: 20px; margin-bottom: 14px; }
     .pc-title { font-family: var(--display); font-size: 28px; letter-spacing: 0.02em; margin-bottom: 12px; }
     .pc-title.bad  { color: #ff3b3b; }
     .pc-title.good { color: var(--accent); }
     .pc-body { font-size: 14px; color: var(--text-dim); line-height: 1.75; }
 
-    /* PLATFORMS */
+    /* ── PLATFORMS ── */
     .platforms {
       position: relative; z-index: 1;
       padding: 50px 40px; max-width: 900px; margin: 0 auto; text-align: center;
@@ -300,7 +354,7 @@
     }
     .pill:hover { color: var(--accent); border-color: rgba(0,229,255,0.3); }
 
-    /* COLLABORATOR TEASER */
+    /* ── COLLABORATOR TEASER ── */
     .ecosystem {
       position: relative; z-index: 1;
       max-width: 900px; margin: 0 auto 60px; padding: 0 40px;
@@ -308,8 +362,8 @@
     .ecosystem-card {
       background: var(--surface2); border: 1px solid var(--border);
       border-left: 3px solid var(--accent3); border-radius: 6px;
-      padding: 32px 36px; display: flex;
-      align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap;
+      padding: 32px 36px;
+      display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap;
     }
     .eco-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; color: var(--accent3); text-transform: uppercase; margin-bottom: 8px; }
     .eco-title { font-family: var(--display); font-size: 32px; letter-spacing: 0.02em; color: var(--text); margin-bottom: 8px; }
@@ -320,19 +374,19 @@
       padding: 6px 14px; border-radius: 20px; text-transform: uppercase; white-space: nowrap;
     }
 
-    /* CTA */
+    /* ── CTA ── */
     .cta-block {
       position: relative; z-index: 1;
       max-width: 820px; margin: 0 auto 100px;
       background: var(--surface); border: 1px solid var(--border);
       border-top: 3px solid var(--accent); border-radius: 6px;
-      padding: 56px 48px; display: flex;
-      align-items: center; justify-content: space-between; gap: 40px; flex-wrap: wrap;
+      padding: 56px 48px;
+      display: flex; align-items: center; justify-content: space-between; gap: 40px; flex-wrap: wrap;
     }
     .cta-left h2 { font-family: var(--display); font-size: 52px; line-height: 0.95; margin-bottom: 12px; }
     .cta-left p { font-size: 14px; color: var(--text-dim); }
 
-    /* FOOTER */
+    /* ── FOOTER ── */
     footer {
       border-top: 1px solid var(--border); padding: 28px 40px;
       display: flex; align-items: center; justify-content: space-between;
@@ -344,7 +398,7 @@
     .footer-right { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
     .footer-right span { color: var(--accent); }
 
-    /* ANIMATIONS */
+    /* ── ANIMATIONS ── */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(22px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -355,20 +409,20 @@
     .hero-note     { animation: fadeUp 0.55s ease both; animation-delay: 0.42s; }
     .hero-actions  { animation: fadeUp 0.55s ease both; animation-delay: 0.52s; }
 
-    /* RESPONSIVE */
+    /* ── RESPONSIVE ── */
     @media (max-width: 700px) {
       nav { padding: 20px; }
       .nav-sub { display: none; }
       .hero { padding: 60px 20px 40px; }
       .hero-headline { font-size: 72px; }
-      .funnel { padding: 0 20px; margin-bottom: 60px; }
+      .engine-wrap { padding: 36px 20px 0; }
+      .funnel, .demo-block, .problem, .platforms, .ecosystem { padding-left: 20px; padding-right: 20px; }
+      .cta-block { margin-left: 20px; margin-right: 20px; padding: 36px 24px; flex-direction: column; }
       .funnel-steps { grid-template-columns: 1fr; }
       .funnel-arrow { display: none; }
       .funnel-step { border-left: none !important; border-top: 3px solid var(--border); }
-      .funnel-step.user-step { border-top-color: var(--accent); }
+      .funnel-step.user-step   { border-top-color: var(--accent); }
       .funnel-step.output-step { border-top-color: var(--accent2); }
-      .demo-block, .problem, .platforms, .ecosystem { padding-left: 20px; padding-right: 20px; }
-      .cta-block { margin-left: 20px; margin-right: 20px; padding: 36px 24px; flex-direction: column; }
       .problem-grid { grid-template-columns: 1fr; }
       .problem-card:first-child { border-radius: 6px 6px 0 0; }
       .problem-card:last-child  { border-radius: 0 0 6px 6px; }
@@ -378,36 +432,13 @@
 </head>
 <body>
 
-  
-<!-- CONTINUATOR INPUT -->
-<div class="demo-block">
-  <p class="demo-label">Paste your AI chat</p>
-
-  <textarea id="inputBox" placeholder="Paste raw AI chat here..."
-    style="width:100%; height:180px; background:#0a0a0f; color:#e8e8f0; border:1px solid #1e1e2e; padding:16px; font-family:'DM Mono', monospace; font-size:13px; border-radius:6px;"></textarea>
-
-  <div style="margin-top:14px;">
-    <button onclick="runContinuator()" class="btn-primary">
-      Run Continuator →
-    </button>
-  </div>
-</div>
-
-<!-- CONTINUATOR OUTPUT -->
-<div class="demo-block">
-  <p class="demo-label">Continuator Output</p>
-
-  <div class="context-pack" id="outputBox">
-    <div style="color:#8888aa;">Output will appear here...</div>
-  </div>
-</div>
-
-
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
   <div class="orb orb-3"></div>
 
-  <!-- NAV -->
+  <!-- ═══════════════════════════════════════════
+       NAV
+  ════════════════════════════════════════════ -->
   <nav>
     <a class="nav-logo" href="/">
       <img src="/icons/icon-192.png" alt="ChatLinx" />
@@ -419,7 +450,9 @@
     </div>
   </nav>
 
-  <!-- HERO -->
+  <!-- ═══════════════════════════════════════════
+       HERO
+  ════════════════════════════════════════════ -->
   <section class="hero">
     <p class="hero-eyebrow">AI Continuity Engine</p>
     <h1 class="hero-headline">
@@ -429,21 +462,54 @@
     <p class="hero-sub">
       Your AI sessions end. Your work <strong>doesn't have to.</strong><br>
       Paste your chat. Get a clean continuity block.<br>
-      Drop it into any AI and carry on — instantly.
+      Drop it into any AI and carry on &mdash; instantly.
     </p>
-    <p class="hero-note">No account. No formatting. Paste raw — exactly as it is.</p>
+    <p class="hero-note">No account &nbsp;&middot;&nbsp; No formatting needed &nbsp;&middot;&nbsp; Paste raw &mdash; exactly as it is</p>
     <div class="hero-actions">
-      <a href="/app" class="btn-primary">Open Continuator →</a>
+      <button onclick="openContinuator()" class="btn-primary">Start Continuator &rarr;</button>
       <a href="#how" class="btn-ghost">
         See how it works
-        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M8 3v10M4 9l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M4 9l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
     </div>
   </section>
 
-  <!-- FUNNEL STRIP -->
+  <!-- ═══════════════════════════════════════════
+       CONTINUATOR ENGINE — hidden by default,
+       revealed on CTA click, scrolled into view
+  ════════════════════════════════════════════ -->
+  <div id="continuator-engine">
+    <div class="engine-wrap">
+
+      <p class="engine-section-label">Continuator Engine</p>
+
+      <!-- INPUT -->
+      <div class="engine-input-block">
+        <p class="engine-input-label">Paste your AI chat below</p>
+        <textarea id="inputBox" placeholder="Paste raw AI chat here — one session or several combined. No formatting needed."></textarea>
+        <div class="engine-run-row">
+          <button onclick="runContinuator()" class="btn-primary">Run Continuator &rarr;</button>
+          <button onclick="clearContinuator()" class="btn-ghost">Clear</button>
+          <span class="engine-note">Runs locally &nbsp;&middot;&nbsp; Nothing is sent anywhere</span>
+        </div>
+      </div>
+
+      <!-- OUTPUT -->
+      <div class="engine-output-block">
+        <div class="engine-output-label-row">
+          <span class="engine-output-label">Continuator Output</span>
+          <button class="copy-btn" id="outputCopyBtn" data-label="Copy Context" onclick="copyOutput()">Copy Context</button>
+        </div>
+        <div id="outputContent">Output will appear here&hellip;</div>
+        <p class="engine-proof">Paste this into Claude, ChatGPT or Gemini &mdash; type <span>&ldquo;continue&rdquo;</span> &mdash; it picks up immediately.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       FUNNEL — how the engine works
+  ════════════════════════════════════════════ -->
   <div class="funnel" id="how">
     <div class="funnel-inner">
       <div class="funnel-header">
@@ -455,79 +521,85 @@
         <div class="funnel-step user-step">
           <div class="fs-label in">You do this</div>
           <div class="fs-word in">Copy</div>
-          <p class="fs-desc">Paste your AI chat — raw, unformatted, any length. One session or several combined. Doesn't matter.</p>
+          <p class="fs-desc">Paste your AI chat &mdash; raw, unformatted, any length. One session or several combined. Doesn&rsquo;t matter.</p>
         </div>
 
-        <div class="funnel-arrow">›</div>
+        <div class="funnel-arrow">&rsaquo;</div>
 
         <div class="funnel-step">
-          <div class="fs-label engine">Engine runs this</div>
+          <div class="fs-label engine">Continuator handles this</div>
           <div class="engine-pills">
-            <div class="engine-pill">Comprehend — reads what matters</div>
-            <div class="engine-pill">Consolidate — strips the noise</div>
-            <div class="engine-pill">Compile — locks current state</div>
-            <div class="engine-pill">Compose — builds the block</div>
+            <div class="engine-pill">Comprehend &mdash; reads what matters</div>
+            <div class="engine-pill">Consolidate &mdash; strips the noise</div>
+            <div class="engine-pill">Compile &mdash; locks current state</div>
+            <div class="engine-pill">Compose &mdash; builds the block</div>
           </div>
         </div>
 
-        <div class="funnel-arrow">›</div>
+        <div class="funnel-arrow">&rsaquo;</div>
 
         <div class="funnel-step output-step">
           <div class="fs-label out">You get this</div>
           <div class="fs-word out">Continue</div>
-          <p class="fs-desc">A compact continuity block. Paste it into any AI, type "continue," and pick up exactly where you left off.</p>
+          <p class="fs-desc">A compact continuity block. Paste it into any AI, type &ldquo;continue,&rdquo; and pick up exactly where you left off.</p>
         </div>
 
       </div>
     </div>
   </div>
 
-  <!-- CONTEXT PACK DEMO -->
+  <!-- ═══════════════════════════════════════════
+       DEMO — static example output
+  ════════════════════════════════════════════ -->
   <div class="demo-block">
-    <p class="demo-label">What the Continuator produces</p>
+    <p class="demo-label">Example Continuator output</p>
     <div class="context-pack" id="contextPackContent">
-      <button class="copy-btn" id="copyBtn" onclick="copyContextPack()">Copy Context</button>
+      <button class="demo-copy-btn" id="demoCopyBtn" data-label="Copy Context" onclick="copyDemoBlock()">Copy Context</button>
       <div class="cp-header">--- CHATLINX CONTINUATOR BLOCK ---</div>
       <div class="cp-section">
         <div class="cp-section-label">Current State</div>
-        <div class="cp-section-body">Landing page redesign in progress. Continuator branding locked. Copy In / Continue Out confirmed as core UX.<span class="cursor"></span></div>
+        <div class="cp-section-body">Continuator build complete. Engine, branding and Copy In / Continue Out funnel all locked.<span class="cursor"></span></div>
       </div>
       <div class="cp-section">
         <div class="cp-section-label">Decisions Made</div>
         <div class="cp-section-body">
           <div class="cp-bullet">Two-product architecture: Continuator (seeder) then Collaborator (power layer)</div>
-          <div class="cp-bullet">Engine runs silently — Comprehend, Consolidate, Compile, Compose</div>
-          <div class="cp-bullet">Output is machine-usable — not a summary, a live launchpad</div>
-          <div class="cp-bullet">Platform agnostic — works in any AI, any session</div>
+          <div class="cp-bullet">4C engine runs silently: Comprehend, Consolidate, Compile, Compose</div>
+          <div class="cp-bullet">Output is machine-ready &mdash; not a summary, a live launchpad</div>
+          <div class="cp-bullet">Platform agnostic &mdash; works in any AI, any session</div>
         </div>
       </div>
       <div class="cp-section">
         <div class="cp-section-label">Next Action</div>
-        <div class="cp-section-body">Deploy updated index.html. Confirm live on AppWow. Soft launch via LinkedIn.</div>
+        <div class="cp-section-body">Deploy to production. List on AppWow. Soft launch via LinkedIn.</div>
       </div>
-      <div class="cp-header" style="margin-top:18px; margin-bottom:0">--- END CONTINUATOR BLOCK ---</div>
+      <div class="cp-header" style="margin-top:18px;margin-bottom:0">--- END CONTINUATOR BLOCK ---</div>
     </div>
-    <p class="demo-proof">Paste this into Claude, ChatGPT or Gemini — type <span>"continue"</span> — it picks up immediately. No re-explaining.</p>
+    <p class="demo-proof">Paste into Claude, ChatGPT or Gemini &mdash; type <span>&ldquo;continue&rdquo;</span> &mdash; it picks up immediately. No re-explaining.</p>
   </div>
 
-  <!-- THE PROBLEM -->
+  <!-- ═══════════════════════════════════════════
+       PROBLEM
+  ════════════════════════════════════════════ -->
   <section class="problem">
     <p class="section-label">The problem Continuator solves</p>
     <div class="problem-grid">
       <div class="problem-card">
-        <div class="pc-icon">✗</div>
+        <div class="pc-icon">&#10007;</div>
         <div class="pc-title bad">Without Continuator</div>
-        <p class="pc-body">Every new AI session starts cold. You re-explain your project, your decisions, your context — again, every time, on every platform. The work resets. The momentum dies.</p>
+        <p class="pc-body">Every new AI session starts cold. You re-explain your project, your decisions, your context &mdash; again, every time, on every platform. The work resets. The momentum dies.</p>
       </div>
       <div class="problem-card">
-        <div class="pc-icon">✓</div>
+        <div class="pc-icon">&#10003;</div>
         <div class="pc-title good">With Continuator</div>
         <p class="pc-body">Paste your chat. Continuator reads it, strips the noise, locks what matters, and hands you a block that any AI understands immediately.<br><br><strong style="color:var(--text)">No reset. No repetition. No drift.</strong></p>
       </div>
     </div>
   </section>
 
-  <!-- PLATFORMS -->
+  <!-- ═══════════════════════════════════════════
+       PLATFORMS
+  ════════════════════════════════════════════ -->
   <section class="platforms">
     <p>Works with every AI platform</p>
     <div class="platform-pills">
@@ -541,15 +613,17 @@
     </div>
   </section>
 
-  <!-- COLLABORATOR TEASER -->
+  <!-- ═══════════════════════════════════════════
+       COLLABORATOR TEASER
+  ════════════════════════════════════════════ -->
   <div class="ecosystem">
     <div class="ecosystem-card">
       <div class="eco-left">
-        <div class="eco-label">Coming next · ChatLinx</div>
+        <div class="eco-label">Coming next &middot; ChatLinx</div>
         <div class="eco-title">The Collaborator</div>
         <p class="eco-desc">
-          Connect your AI accounts — Claude, ChatGPT, Gemini and more — all on one surface.
-          Use each for what it does best — without losing your place when you switch.
+          Connect your AI accounts &mdash; Claude, ChatGPT, Gemini and more &mdash; all on one surface.
+          Use each for what it does best &mdash; without losing your place when you switch.
           One flow. No friction. No lost context.
         </p>
       </div>
@@ -557,100 +631,217 @@
     </div>
   </div>
 
-  <!-- CTA -->
+  <!-- ═══════════════════════════════════════════
+       CTA
+  ════════════════════════════════════════════ -->
   <div class="cta-block">
     <div class="cta-left">
       <h2>Copy In.<br>Continue Out.</h2>
       <p>Runs in your browser. No account required.</p>
     </div>
-    <a href="/app" class="btn-primary" style="white-space:nowrap; font-size:14px; padding:16px 36px;">
-      Open Continuator →
-    </a>
+    <button onclick="openContinuator()" class="btn-primary" style="white-space:nowrap;font-size:14px;padding:16px 36px;">
+      Start Continuator &rarr;
+    </button>
   </div>
 
-  <!-- FOOTER -->
+  <!-- ═══════════════════════════════════════════
+       FOOTER
+  ════════════════════════════════════════════ -->
   <footer>
     <div class="footer-left">
-      ChatLinx Continuator &nbsp;·&nbsp; Part of the <a href="https://appwow.app" target="_blank">AppWow Evosystem</a> &nbsp;·&nbsp; © 2026 Vesiron Tech Ltd
+      ChatLinx Continuator &nbsp;&middot;&nbsp; Part of the <a href="https://appwow.app" target="_blank">AppWow Evosystem</a> &nbsp;&middot;&nbsp; &copy; 2026 Vesiron Tech Ltd
     </div>
     <div class="footer-right">Built by <span>vDig Forge</span></div>
   </footer>
 
+  <!-- ═══════════════════════════════════════════
+       SCRIPTS
+  ════════════════════════════════════════════ -->
   <script>
-function runContinuator() {
-  const input = document.getElementById('inputBox').value;
 
-  if (!input.trim()) {
-    alert("Paste a chat first.");
-    return;
-  }
-
-  const lines = input.split('\n').map(l => l.trim()).filter(Boolean);
-
-  // --- SIMPLE HEURISTIC ENGINE ---
-
-  let currentState = [];
-  let decisions = [];
-  let nextAction = [];
-
-  lines.forEach((line, i) => {
-    const lower = line.toLowerCase();
-
-    // Detect decisions
-    if (
-      lower.includes("decided") ||
-      lower.includes("we will") ||
-      lower.includes("we should") ||
-      lower.includes("agreed") ||
-      lower.includes("plan is")
-    ) {
-      decisions.push(line);
+    /* ── OPEN ENGINE ── */
+    function openContinuator() {
+      const el = document.getElementById('continuator-engine');
+      if (!el.classList.contains('active')) {
+        el.classList.add('active');
+      }
+      setTimeout(() => {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 50);
+      setTimeout(() => {
+        document.getElementById('inputBox').focus();
+      }, 600);
     }
 
-    // Detect next actions
-    if (
-      lower.includes("next") ||
-      lower.includes("todo") ||
-      lower.includes("to do") ||
-      lower.includes("action") ||
-      lower.includes("need to")
-    ) {
-      nextAction.push(line);
+    /* ── RUN ENGINE ── */
+    function runContinuator() {
+      const input = document.getElementById('inputBox').value;
+
+      if (!input.trim()) {
+        alert('Paste a chat first.');
+        return;
+      }
+
+      if (input.length > 20000) {
+        alert('Input too large. Please paste a smaller section — ideally one session at a time.');
+        return;
+      }
+
+      document.getElementById('outputContent').innerText = 'Processing\u2026';
+
+      setTimeout(function() {
+
+      const lines = input.split('\n').map(function(l) { return l.trim(); }).filter(Boolean);
+
+      var currentState = [];
+      var decisions    = [];
+      var nextAction   = [];
+
+      lines.forEach(function(line, i) {
+        var lower = line.toLowerCase();
+
+        if (
+          lower.includes('decided') ||
+          lower.includes('we will') ||
+          lower.includes('we should') ||
+          lower.includes('agreed') ||
+          lower.includes('plan is') ||
+          lower.includes('locked') ||
+          lower.includes('confirmed')
+        ) {
+          decisions.push(line);
+        }
+
+        if (
+          lower.includes('next') ||
+          lower.includes('todo') ||
+          lower.includes('to do') ||
+          lower.includes('action') ||
+          lower.includes('need to') ||
+          lower.includes('step is') ||
+          lower.includes('deploy') ||
+          lower.includes('launch')
+        ) {
+          nextAction.push(line);
+        }
+
+        if (
+          lower.includes('current') ||
+          lower.includes('status') ||
+          lower.includes('now') ||
+          lower.includes('working') ||
+          lower.includes('building') ||
+          i > lines.length - 4
+        ) {
+          currentState.push(line);
+        }
+      });
+
+      if (!currentState.length) currentState = ['Working session detected. Context extracted.'];
+      if (!decisions.length)    decisions    = ['No explicit decisions detected — inferred continuity maintained.'];
+      if (!nextAction.length)   nextAction   = ['Continue development based on latest context.'];
+
+      currentState = Array.from(new Set(currentState)).slice(-3);
+      decisions    = decisions.slice(0, 4);
+      nextAction   = nextAction.slice(0, 2);
+
+      var output = [
+        '--- CHATLINX CONTINUATOR BLOCK ---',
+        '',
+        'CURRENT STATE',
+        currentState.join(' '),
+        '',
+        'DECISIONS MADE',
+        decisions.map(function(d) { return '- ' + d; }).join('\n'),
+        '',
+        'NEXT ACTION',
+        nextAction.join(' '),
+        '',
+        'INSTRUCTION',
+        'Continue from NEXT ACTION. Do not repeat context. Proceed directly.',
+        '',
+        '--- END CONTINUATOR BLOCK ---'
+      ].join('\n');
+
+      document.getElementById('outputContent').innerText = output;
+
+      setTimeout(function() {
+        document.getElementById('outputContent').scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
+      }, 100);
+
+      }, 120);
     }
 
-    // Capture recent lines as current state (last ~5 meaningful lines)
-    if (i > lines.length - 6) {
-      currentState.push(line);
+    /* ── CLEAR ENGINE ── */
+    function clearContinuator() {
+      document.getElementById('inputBox').value = '';
+      document.getElementById('outputContent').innerText = 'Output will appear here\u2026';
+      document.getElementById('inputBox').focus();
     }
-  });
 
-  // Fallbacks (so it always outputs something)
-  if (!currentState.length) currentState = ["Working session detected. Context extracted."];
-  if (!decisions.length) decisions = ["No explicit decisions detected — inferred continuity maintained."];
-  if (!nextAction.length) nextAction = ["Continue development based on latest context."];
+    /* ── COPY OUTPUT ── */
+    function copyOutput() {
+      var btn  = document.getElementById('outputCopyBtn');
+      var text = document.getElementById('outputContent').innerText.trim();
 
-  // Limit size (keep output tight)
-  currentState = currentState.slice(-3);
-  decisions = decisions.slice(0, 4);
-  nextAction = nextAction.slice(0, 2);
+      if (
+        !text ||
+        text.startsWith('Output will appear') ||
+        text.startsWith('Processing')
+      ) {
+        alert('Run the Continuator first.');
+        return;
+      }
+      clipboardCopy(text, btn);
+    }
 
-  // --- BUILD OUTPUT BLOCK ---
+    /* ── COPY DEMO BLOCK ── */
+    function copyDemoBlock() {
+      var btn  = document.getElementById('demoCopyBtn');
+      var pack = document.getElementById('contextPackContent');
+      var clone = pack.cloneNode(true);
+      clone.querySelector('button') && clone.querySelector('button').remove();
+      clone.querySelector('.cursor') && clone.querySelector('.cursor').remove();
+      var text = clone.innerText.replace(/\n\n+/g, '\n\n').trim();
+      clipboardCopy(text, btn);
+    }
 
-  const output = `
---- CHATLINX CONTINUATOR BLOCK ---
+    /* ── SHARED CLIPBOARD UTILITY ── */
+    function clipboardCopy(text, btn) {
+      function onSuccess() {
+        btn.textContent = 'Copied \u2713';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.textContent = btn.getAttribute('data-label') || 'Copy';
+          btn.classList.remove('copied');
+        }, 2200);
+      }
+      function onFail() {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;';
+        document.body.appendChild(ta);
+        ta.focus(); ta.select();
+        try {
+          document.execCommand('copy');
+          onSuccess();
+        } catch(e) {
+          btn.textContent = 'Copy failed';
+          setTimeout(function() { btn.textContent = btn.getAttribute('data-label') || 'Copy'; }, 2500);
+        }
+        document.body.removeChild(ta);
+      }
 
-CURRENT STATE
-${currentState.join(' ')}
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(onSuccess).catch(onFail);
+      } else {
+        onFail();
+      }
+    }
 
-DECISIONS MADE
-${decisions.map(d => '• ' + d).join('\n')}
-
-NEXT ACTION
-${nextAction.join(' ')}
-
---- END CONTINUATOR BLOCK ---
-  `.trim();
-
-  document.getElementById('outputBox').innerText = output;
-}
-</script>
+  </script>
+</body>
+</html>
