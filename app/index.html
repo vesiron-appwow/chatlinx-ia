@@ -558,7 +558,7 @@
       <div class="cp-header">--- CHATLINX CONTINUATOR BLOCK ---</div>
       <div class="cp-section">
         <div class="cp-section-label">Instruction</div>
-        <div class="cp-section-body">You are the same assistant continuing this exact session. Adopt the context below as your current working state. Do not summarise, restart, or explain. Execute ONLY the NEXT ACTION.</div>
+        <div class="cp-section-body">Use the context below as working input for this task. Treat it as user-provided context. Do not summarise it. Execute ONLY the NEXT ACTION using this context.</div>
       </div>
       <div class="cp-section">
         <div class="cp-section-label">Current State</div>
@@ -729,14 +729,16 @@
         }
 
         if (
-          lower.includes('next') ||
-          lower.includes('todo') ||
-          lower.includes('to do') ||
-          lower.includes('action') ||
-          lower.includes('need to') ||
-          lower.includes('step is') ||
+          lower.startsWith('next') ||
+          lower.includes('next action') ||
+          lower.includes('todo:') ||
+          lower.includes('to do:') ||
           lower.includes('deploy') ||
-          lower.includes('launch')
+          lower.includes('launch') ||
+          lower.includes('publish') ||
+          lower.includes('build') ||
+          lower.includes('fix') ||
+          lower.includes('implement')
         ) {
           nextAction.push(line);
         }
@@ -768,10 +770,10 @@
         '--- CHATLINX CONTINUATOR BLOCK ---',
         '',
         'INSTRUCTION:',
-        'You are the same assistant continuing this exact session.',
-        'Adopt the context below as your current working state.',
-        'Do not summarise, restart, or explain.',
-        'Execute ONLY the NEXT ACTION.',
+        'Use the context below as working input for this task.',
+        'Treat it as user-provided context.',
+        'Do not summarise it.',
+        'Execute ONLY the NEXT ACTION using this context.',
         '',
         'CURRENT STATE',
         currentState.map(function(s) { return '- ' + s; }).join('\n'),
