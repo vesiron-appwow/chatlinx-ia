@@ -378,6 +378,31 @@
 </head>
 <body>
 
+  
+<!-- CONTINUATOR INPUT -->
+<div class="demo-block">
+  <p class="demo-label">Paste your AI chat</p>
+
+  <textarea id="inputBox" placeholder="Paste raw AI chat here..."
+    style="width:100%; height:180px; background:#0a0a0f; color:#e8e8f0; border:1px solid #1e1e2e; padding:16px; font-family:'DM Mono', monospace; font-size:13px; border-radius:6px;"></textarea>
+
+  <div style="margin-top:14px;">
+    <button onclick="runContinuator()" class="btn-primary">
+      Run Continuator →
+    </button>
+  </div>
+</div>
+
+<!-- CONTINUATOR OUTPUT -->
+<div class="demo-block">
+  <p class="demo-label">Continuator Output</p>
+
+  <div class="context-pack" id="outputBox">
+    <div style="color:#8888aa;">Output will appear here...</div>
+  </div>
+</div>
+
+
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
   <div class="orb orb-3"></div>
@@ -552,47 +577,80 @@
   </footer>
 
   <script>
-    function copyContextPack() {
-      const btn  = document.getElementById('copyBtn');
-      const pack = document.getElementById('contextPackContent');
-      const clone = pack.cloneNode(true);
-      clone.querySelector('button')?.remove();
-      clone.querySelector('.cursor')?.remove();
-      const text = clone.innerText.replace(/\n\n+/g, '\n\n').trim();
+function runContinuator() {
+  const input = document.getElementById('inputBox').value;
 
-      function onSuccess() {
-        btn.textContent = 'Copied ✓';
-        btn.classList.add('copied');
-        setTimeout(() => {
-          btn.textContent = 'Copy Context';
-          btn.classList.remove('copied');
-        }, 2000);
-      }
+  if (!input.trim()) {
+    alert("Paste a chat first.");
+    return;
+  }
 
-      function onFail() {
-        // Fallback: create a temporary textarea, select, execCommand
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;';
-        document.body.appendChild(ta);
-        ta.focus();
-        ta.select();
-        try {
-          document.execCommand('copy');
-          onSuccess();
-        } catch(e) {
-          btn.textContent = 'Copy failed';
-          setTimeout(() => { btn.textContent = 'Copy Context'; }, 2500);
-        }
-        document.body.removeChild(ta);
-      }
+  const lines = input.split('\n').map(l => l.trim()).filter(Boolean);
 
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(onSuccess).catch(onFail);
-      } else {
-        onFail();
-      }
+  // --- SIMPLE HEURISTIC ENGINE ---
+
+  let currentState = [];
+  let decisions = [];
+  let nextAction = [];
+
+  lines.forEach((line, i) => {
+    const lower = line.toLowerCase();
+
+    // Detect decisions
+    if (
+      lower.includes("decided") ||
+      lower.includes("we will") ||
+      lower.includes("we should") ||
+      lower.includes("agreed") ||
+      lower.includes("plan is")
+    ) {
+      decisions.push(line);
     }
-  </script>
-</body>
-</html>
+
+    // Detect next actions
+    if (
+      lower.includes("next") ||
+      lower.includes("todo") ||
+      lower.includes("to do") ||
+      lower.includes("action") ||
+      lower.includes("need to")
+    ) {
+      nextAction.push(line);
+    }
+
+    // Capture recent lines as current state (last ~5 meaningful lines)
+    if (i > lines.length - 6) {
+      currentState.push(line);
+    }
+  });
+
+  // Fallbacks (so it always outputs something)
+  if (!currentState.length) currentState = ["Working session detected. Context extracted."];
+  if (!decisions.length) decisions = ["No explicit decisions detected — inferred continuity maintained."];
+  if (!nextAction.length) nextAction = ["Continue development based on latest context."];
+
+  // Limit size (keep output tight)
+  currentState = currentState.slice(-3);
+  decisions = decisions.slice(0, 4);
+  nextAction = nextAction.slice(0, 2);
+
+  // --- BUILD OUTPUT BLOCK ---
+
+  const output = `
+--- CHATLINX CONTINUATOR BLOCK ---
+
+CURRENT STATE
+${currentState.join(' ')}
+
+DECISIONS MADE
+${decisions.map(d => '• ' + d).join('\n')}
+
+NEXT ACTION
+${nextAction.join(' ')}
+
+--- END CONTINUATOR BLOCK ---
+  `.trim();
+
+  document.getElementById('outputBox').innerText = output;
+}
+</script>
