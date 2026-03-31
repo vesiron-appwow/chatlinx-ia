@@ -557,11 +557,15 @@
       <button class="demo-copy-btn" id="demoCopyBtn" data-label="Copy Context" onclick="copyDemoBlock()">Copy Context</button>
       <div class="cp-header">--- CHATLINX CONTINUATOR BLOCK ---</div>
       <div class="cp-section">
+        <div class="cp-section-label">Instruction</div>
+        <div class="cp-section-body">You are the same assistant continuing this exact session. Adopt the context below as your current working state. Do not summarise, restart, or explain. Execute ONLY the NEXT ACTION.</div>
+      </div>
+      <div class="cp-section">
         <div class="cp-section-label">Current State</div>
         <div class="cp-section-body">Continuator build complete. Engine, branding and Copy In / Continue Out funnel all locked.<span class="cursor"></span></div>
       </div>
       <div class="cp-section">
-        <div class="cp-section-label">Decisions Made</div>
+        <div class="cp-section-label">Key Decisions</div>
         <div class="cp-section-body">
           <div class="cp-bullet">Two-product architecture: Continuator (seeder) then Collaborator (power layer)</div>
           <div class="cp-bullet">4C engine runs silently: Comprehend, Consolidate, Compile, Compose</div>
@@ -570,12 +574,17 @@
         </div>
       </div>
       <div class="cp-section">
+        <div class="cp-section-label">Active Task</div>
+        <div class="cp-section-body">Continuator build complete. Engine, branding and Copy In / Continue Out funnel all locked.</div>
+      </div>
+      <div class="cp-section">
         <div class="cp-section-label">Next Action</div>
         <div class="cp-section-body">Deploy to production. List on AppWow. Soft launch via LinkedIn.</div>
       </div>
-      <div class="cp-header" style="margin-top:18px;margin-bottom:0">--- END CONTINUATOR BLOCK ---</div>
+      <div class="cp-header" style="margin-top:18px;margin-bottom:4px">--- END CONTINUATOR BLOCK ---</div>
+      <div style="font-family:var(--mono);font-size:12px;color:var(--accent2);margin-top:10px;line-height:1.7;">Continue from NEXT ACTION.<br>Do not summarise. Begin immediately.</div>
     </div>
-    <p class="demo-proof">Paste into Claude, ChatGPT or Gemini &mdash; type <span>&ldquo;continue&rdquo;</span> &mdash; it picks up immediately. No re-explaining.</p>
+    <p class="demo-proof">Paste this entire block into Claude, ChatGPT or Gemini &mdash; <span>it continues immediately</span>. No typing needed. No re-explaining.</p>
   </div>
 
   <!-- ═══════════════════════════════════════════
@@ -682,22 +691,29 @@
         return;
       }
 
-      if (input.length > 20000) {
-        alert('Input too large. Please paste a smaller section — ideally one session at a time.');
-        return;
-      }
+      // no hard cap — allow full input
 
       document.getElementById('outputContent').innerText = 'Processing\u2026';
 
       setTimeout(function() {
 
-      const lines = input.split('\n').map(function(l) { return l.trim(); }).filter(Boolean);
+      const MAX_CHARS = 8000;
+      var chunks = [];
+      for (var i = 0; i < input.length; i += MAX_CHARS) {
+        chunks.push(input.slice(i, i + MAX_CHARS));
+      }
+
+      var allLines = [];
+      chunks.forEach(function(chunk) {
+        var lines = chunk.split('\n').map(function(l) { return l.trim(); }).filter(Boolean);
+        allLines = allLines.concat(lines);
+      });
 
       var currentState = [];
       var decisions    = [];
       var nextAction   = [];
 
-      lines.forEach(function(line, i) {
+      allLines.forEach(function(line, i) {
         var lower = line.toLowerCase();
 
         if (
@@ -731,7 +747,7 @@
           lower.includes('now') ||
           lower.includes('working') ||
           lower.includes('building') ||
-          i > lines.length - 4
+          i > allLines.length - 4
         ) {
           currentState.push(line);
         }
@@ -745,22 +761,34 @@
       decisions    = decisions.slice(0, 4);
       nextAction   = nextAction.slice(0, 2);
 
+      var primaryAction = nextAction[0]   || 'Continue based on current context';
+      var activeTask    = primaryAction;
+
       var output = [
         '--- CHATLINX CONTINUATOR BLOCK ---',
         '',
-        'CURRENT STATE',
-        currentState.join(' '),
+        'INSTRUCTION:',
+        'You are the same assistant continuing this exact session.',
+        'Adopt the context below as your current working state.',
+        'Do not summarise, restart, or explain.',
+        'Execute ONLY the NEXT ACTION.',
         '',
-        'DECISIONS MADE',
+        'CURRENT STATE',
+        currentState.map(function(s) { return '- ' + s; }).join('\n'),
+        '',
+        'KEY DECISIONS',
         decisions.map(function(d) { return '- ' + d; }).join('\n'),
         '',
+        'ACTIVE TASK',
+        activeTask,
+        '',
         'NEXT ACTION',
-        nextAction.join(' '),
+        primaryAction,
         '',
-        'INSTRUCTION',
-        'Continue from NEXT ACTION. Do not repeat context. Proceed directly.',
+        '--- END CONTINUATOR BLOCK ---',
         '',
-        '--- END CONTINUATOR BLOCK ---'
+        'Continue from NEXT ACTION.',
+        'Do not summarise. Begin immediately.'
       ].join('\n');
 
       document.getElementById('outputContent').innerText = output;
