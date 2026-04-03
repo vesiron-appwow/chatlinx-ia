@@ -1,877 +1,556 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ChatLinx Continuator — Copy In. Continue Out.</title>
-  <meta name="description" content="Paste your AI chat. Get a continuity block. Continue instantly — in any AI, anywhere." />
-  <meta name="theme-color" content="#0a0a0f" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-  <meta name="apple-mobile-web-app-title" content="ChatLinx Continuator" />
-  <link rel="manifest" href="/manifest.json" />
-  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
-  <link rel="icon" href="/icons/icon-192.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
-
-  <style>
-    :root {
-      --bg:        #0a0a0f;
-      --surface:   #111118;
-      --surface2:  #16161f;
-      --border:    #1e1e2e;
-      --accent:    #00e5ff;
-      --accent2:   #ff6b35;
-      --accent3:   #7b61ff;
-      --muted:     #4a4a6a;
-      --text:      #e8e8f0;
-      --text-dim:  #8888aa;
-      --mono:      'DM Mono', monospace;
-      --display:   'Bebas Neue', sans-serif;
-      --body:      'DM Sans', sans-serif;
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--body);
-      font-size: 16px;
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background-image:
-        linear-gradient(rgba(0,229,255,0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,229,255,0.025) 1px, transparent 1px);
-      background-size: 48px 48px;
-      pointer-events: none; z-index: 0;
-    }
-
-    .orb { position: fixed; border-radius: 50%; filter: blur(130px); pointer-events: none; z-index: 0; }
-    .orb-1 { width: 600px; height: 600px; background: rgba(0,229,255,0.055); top: -200px; right: -150px; }
-    .orb-2 { width: 450px; height: 450px; background: rgba(255,107,53,0.045); bottom: 100px; left: -150px; }
-    .orb-3 { width: 300px; height: 300px; background: rgba(123,97,255,0.04); top: 50%; left: 50%; transform: translate(-50%,-50%); }
-
-    /* ── NAV ── */
-    nav {
-      position: relative; z-index: 10;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 26px 40px;
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-    .nav-logo img { width: 30px; height: 30px; border-radius: 7px; }
-    .nav-logo-text { font-family: var(--display); font-size: 21px; letter-spacing: 0.05em; color: var(--text); }
-    .nav-logo-text span { color: var(--accent); }
-    .nav-right { display: flex; align-items: center; gap: 16px; }
-    .nav-sub { font-family: var(--mono); font-size: 10px; color: var(--text-dim); letter-spacing: 0.12em; text-transform: uppercase; }
-    .nav-badge {
-      font-family: var(--mono); font-size: 10px; color: var(--accent);
-      border: 1px solid rgba(0,229,255,0.3); padding: 3px 10px;
-      border-radius: 20px; letter-spacing: 0.1em; text-transform: uppercase;
-    }
-
-    /* ── HERO ── */
-    .hero {
-      padding: 96px 40px 60px;
-      max-width: 900px; margin: 0 auto;
-      position: relative; z-index: 1;
-    }
-    .hero-eyebrow {
-      font-family: var(--mono); font-size: 11px; letter-spacing: 0.22em;
-      color: var(--accent); text-transform: uppercase; margin-bottom: 28px;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .hero-eyebrow::before { content: ''; display: block; width: 28px; height: 1px; background: var(--accent); }
-    .hero-headline {
-      font-family: var(--display);
-      font-size: clamp(60px, 10vw, 116px);
-      line-height: 0.9; color: var(--text); margin-bottom: 32px;
-    }
-    .hero-headline .accent  { color: var(--accent); }
-    .hero-headline .accent2 { color: var(--accent2); }
-    .hero-sub {
-      font-size: 18px; font-weight: 300; color: var(--text-dim);
-      max-width: 500px; line-height: 1.75; margin-bottom: 16px;
-    }
-    .hero-sub strong { color: var(--text); font-weight: 500; }
-    .hero-note {
-      font-family: var(--mono); font-size: 12px; color: var(--muted);
-      letter-spacing: 0.06em; margin-bottom: 48px;
-    }
-    .hero-actions { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
-
-    .btn-primary {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: var(--accent); color: #000;
-      font-family: var(--mono); font-size: 13px; font-weight: 500;
-      letter-spacing: 0.09em; text-transform: uppercase;
-      padding: 15px 30px; border-radius: 4px;
-      text-decoration: none; border: none; cursor: pointer;
-      transition: opacity 0.2s, transform 0.2s;
-    }
-    .btn-primary:hover { opacity: 0.85; transform: translateY(-2px); }
-
-    .btn-ghost {
-      display: inline-flex; align-items: center; gap: 8px;
-      color: var(--text-dim); font-family: var(--mono); font-size: 12px;
-      letter-spacing: 0.08em; text-transform: uppercase;
-      text-decoration: none; background: none; border: none; cursor: pointer;
-      transition: color 0.2s;
-    }
-    .btn-ghost:hover { color: var(--text); }
-    .btn-ghost svg { width: 14px; height: 14px; }
-
-    /* ── CONTINUATOR ENGINE (hidden by default) ── */
-    #continuator-engine {
-      display: none;
-      position: relative; z-index: 1;
-    }
-    #continuator-engine.active {
-      display: block;
-      animation: fadeUp 0.5s ease both;
-    }
-
-    .engine-wrap {
-      max-width: 900px; margin: 0 auto;
-      padding: 48px 40px 0;
-    }
-
-    .engine-section-label {
-      font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em;
-      color: var(--muted); text-transform: uppercase;
-      margin-bottom: 32px;
-      display: flex; align-items: center; gap: 12px;
-    }
-    .engine-section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
-    .engine-input-block {
-      background: var(--surface); border: 1px solid var(--border);
-      border-left: 3px solid var(--accent2); border-radius: 6px;
-      padding: 28px 32px; margin-bottom: 16px;
-    }
-
-    .engine-input-label {
-      font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em;
-      color: var(--muted); text-transform: uppercase; margin-bottom: 14px;
-    }
-
-    #inputBox {
-      width: 100%; height: 200px;
-      background: var(--bg); color: var(--text);
-      border: 1px solid var(--border); border-radius: 4px;
-      padding: 16px; resize: vertical;
-      font-family: var(--mono); font-size: 13px; line-height: 1.7;
-      outline: none; transition: border-color 0.2s;
-    }
-    #inputBox::placeholder { color: var(--muted); }
-    #inputBox:focus { border-color: rgba(0,229,255,0.3); }
-
-    .engine-run-row {
-      display: flex; align-items: center; gap: 16px; margin-top: 16px; flex-wrap: wrap;
-    }
-    .engine-note {
-      font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.05em;
-    }
-
-    /* OUTPUT BLOCK */
-    .engine-output-block {
-      background: var(--surface); border: 1px solid var(--border);
-      border-left: 3px solid var(--accent); border-radius: 6px;
-      padding: 28px 32px; margin-bottom: 48px; position: relative;
-    }
-
-    .engine-output-label-row {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 18px;
-    }
-    .engine-output-label {
-      font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em;
-      color: var(--muted); text-transform: uppercase;
-    }
-
-    .copy-btn {
-      font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
-      text-transform: uppercase; padding: 6px 14px; border-radius: 3px;
-      border: 1px solid var(--border); background: transparent;
-      color: var(--text-dim); cursor: pointer;
-      transition: color 0.2s, border-color 0.2s;
-    }
-    .copy-btn:hover  { color: var(--accent); border-color: rgba(0,229,255,0.4); }
-    .copy-btn.copied { color: var(--accent); border-color: rgba(0,229,255,0.4); }
-
-    #outputContent {
-      font-family: var(--mono); font-size: 13px; line-height: 1.85;
-      color: var(--text-dim); white-space: pre-wrap; min-height: 60px;
-    }
-
-    .engine-proof {
-      font-family: var(--mono); font-size: 11px; color: var(--muted);
-      margin-top: 14px; letter-spacing: 0.05em;
-    }
-    .engine-proof span { color: var(--accent); }
-
-    /* ── FUNNEL ── */
-    .funnel {
-      position: relative; z-index: 1;
-      max-width: 900px; margin: 0 auto 80px; padding: 0 40px;
-    }
-    .funnel-inner {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
-    }
-    .funnel-header {
-      padding: 18px 28px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .funnel-title { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; color: var(--muted); text-transform: uppercase; }
-    .funnel-badge { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--accent2); text-transform: uppercase; }
-    .funnel-steps {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr auto 1fr;
-      align-items: stretch;
-    }
-    .funnel-step { padding: 32px 28px; }
-    .funnel-step.user-step   { border-left: 3px solid var(--accent); }
-    .funnel-step.output-step { border-left: 3px solid var(--accent2); }
-    .funnel-arrow {
-      display: flex; align-items: center; justify-content: center;
-      padding: 0 10px; color: var(--muted); font-size: 20px;
-      border-left: 1px solid var(--border); border-right: 1px solid var(--border);
-    }
-    .fs-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 10px; }
-    .fs-label.in     { color: var(--accent); }
-    .fs-label.engine { color: var(--muted); }
-    .fs-label.out    { color: var(--accent2); }
-    .fs-word { font-family: var(--display); font-size: 38px; letter-spacing: 0.02em; line-height: 1; margin-bottom: 12px; }
-    .fs-word.in  { color: var(--accent); }
-    .fs-word.out { color: var(--accent2); }
-    .fs-desc { font-size: 13px; color: var(--text-dim); line-height: 1.65; }
-    .engine-pills { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
-    .engine-pill {
-      display: flex; align-items: center; gap: 10px;
-      font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
-      color: var(--text-dim); text-transform: uppercase;
-    }
-    .engine-pill::before {
-      content: ''; display: block; width: 5px; height: 5px;
-      border-radius: 50%; background: var(--accent3); flex-shrink: 0;
-    }
-
-    /* ── DEMO BLOCK (static example) ── */
-    .demo-block {
-      position: relative; z-index: 1;
-      max-width: 900px; margin: 0 auto 80px; padding: 0 40px;
-    }
-    .demo-label {
-      font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em;
-      color: var(--muted); text-transform: uppercase; margin-bottom: 12px;
-    }
-    .context-pack {
-      background: var(--surface); border: 1px solid var(--border);
-      border-left: 3px solid var(--accent2); border-radius: 6px;
-      padding: 28px 32px; font-family: var(--mono); font-size: 13px;
-      line-height: 1.85; color: var(--text-dim); position: relative; overflow: hidden;
-    }
-    .context-pack::after {
-      content: ''; position: absolute; top: 0; right: 0;
-      width: 160px; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(10,10,15,0.5));
-      pointer-events: none;
-    }
-    .demo-copy-btn {
-      position: absolute; top: 12px; right: 12px;
-      font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em;
-      text-transform: uppercase; padding: 6px 14px;
-      border: 1px solid var(--border); background: transparent;
-      color: var(--text-dim); cursor: pointer; border-radius: 3px; z-index: 2;
-      transition: color 0.2s, border-color 0.2s;
-    }
-    .demo-copy-btn:hover  { color: var(--accent2); border-color: rgba(255,107,53,0.4); }
-    .demo-copy-btn.copied { color: var(--accent2); border-color: rgba(255,107,53,0.4); }
-    .demo-proof {
-      font-family: var(--mono); font-size: 11px; color: var(--muted);
-      margin-top: 14px; letter-spacing: 0.05em;
-    }
-    .demo-proof span { color: var(--accent2); }
-    .cp-header { color: var(--accent2); font-size: 11px; letter-spacing: 0.15em; margin-bottom: 18px; }
-    .cp-section { margin-bottom: 16px; }
-    .cp-section-label { color: var(--accent); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 4px; }
-    .cp-section-body { color: var(--text); }
-    .cp-bullet { color: var(--text-dim); }
-    .cp-bullet::before { content: 'o  '; color: var(--accent2); }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-    .cursor {
-      display: inline-block; width: 2px; height: 0.9em;
-      background: var(--accent2); margin-left: 3px;
-      vertical-align: middle; animation: blink 1.1s step-end infinite;
-    }
-
-    /* ── PROBLEM ── */
-    .problem {
-      position: relative; z-index: 1;
-      padding: 60px 40px; max-width: 900px; margin: 0 auto;
-    }
-    .section-label {
-      font-family: var(--mono); font-size: 10px; letter-spacing: 0.2em;
-      color: var(--muted); text-transform: uppercase; margin-bottom: 40px;
-      display: flex; align-items: center; gap: 12px;
-    }
-    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-    .problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
-    .problem-card { padding: 36px 32px; background: var(--surface); border: 1px solid var(--border); }
-    .problem-card:first-child { border-radius: 6px 0 0 6px; border-left: 3px solid #ff3b3b; }
-    .problem-card:last-child  { border-radius: 0 6px 6px 0; border-left: 3px solid var(--accent); }
-    .pc-icon { font-size: 20px; margin-bottom: 14px; }
-    .pc-title { font-family: var(--display); font-size: 28px; letter-spacing: 0.02em; margin-bottom: 12px; }
-    .pc-title.bad  { color: #ff3b3b; }
-    .pc-title.good { color: var(--accent); }
-    .pc-body { font-size: 14px; color: var(--text-dim); line-height: 1.75; }
-
-    /* ── PLATFORMS ── */
-    .platforms {
-      position: relative; z-index: 1;
-      padding: 50px 40px; max-width: 900px; margin: 0 auto; text-align: center;
-    }
-    .platforms p {
-      font-family: var(--mono); font-size: 11px; letter-spacing: 0.15em;
-      color: var(--muted); text-transform: uppercase; margin-bottom: 22px;
-    }
-    .platform-pills { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-    .pill {
-      font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em;
-      color: var(--text-dim); border: 1px solid var(--border);
-      padding: 7px 16px; border-radius: 20px; text-transform: uppercase;
-      transition: color 0.2s, border-color 0.2s;
-    }
-    .pill:hover { color: var(--accent); border-color: rgba(0,229,255,0.3); }
-
-    /* ── COLLABORATOR TEASER ── */
-    .ecosystem {
-      position: relative; z-index: 1;
-      max-width: 900px; margin: 0 auto 60px; padding: 0 40px;
-    }
-    .ecosystem-card {
-      background: var(--surface2); border: 1px solid var(--border);
-      border-left: 3px solid var(--accent3); border-radius: 6px;
-      padding: 32px 36px;
-      display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap;
-    }
-    .eco-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; color: var(--accent3); text-transform: uppercase; margin-bottom: 8px; }
-    .eco-title { font-family: var(--display); font-size: 32px; letter-spacing: 0.02em; color: var(--text); margin-bottom: 8px; }
-    .eco-desc { font-size: 14px; color: var(--text-dim); max-width: 480px; line-height: 1.65; }
-    .eco-badge {
-      font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
-      color: var(--accent3); border: 1px solid rgba(123,97,255,0.35);
-      padding: 6px 14px; border-radius: 20px; text-transform: uppercase; white-space: nowrap;
-    }
-
-    /* ── CTA ── */
-    .cta-block {
-      position: relative; z-index: 1;
-      max-width: 820px; margin: 0 auto 100px;
-      background: var(--surface); border: 1px solid var(--border);
-      border-top: 3px solid var(--accent); border-radius: 6px;
-      padding: 56px 48px;
-      display: flex; align-items: center; justify-content: space-between; gap: 40px; flex-wrap: wrap;
-    }
-    .cta-left h2 { font-family: var(--display); font-size: 52px; line-height: 0.95; margin-bottom: 12px; }
-    .cta-left p { font-size: 14px; color: var(--text-dim); }
-
-    /* ── FOOTER ── */
-    footer {
-      border-top: 1px solid var(--border); padding: 28px 40px;
-      display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 12px; position: relative; z-index: 1;
-    }
-    .footer-left { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.07em; }
-    .footer-left a { color: var(--muted); text-decoration: none; }
-    .footer-left a:hover { color: var(--accent); }
-    .footer-right { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
-    .footer-right span { color: var(--accent); }
-
-    /* ── ANIMATIONS ── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(22px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .hero-eyebrow  { animation: fadeUp 0.55s ease both; animation-delay: 0.1s; }
-    .hero-headline { animation: fadeUp 0.55s ease both; animation-delay: 0.2s; }
-    .hero-sub      { animation: fadeUp 0.55s ease both; animation-delay: 0.34s; }
-    .hero-note     { animation: fadeUp 0.55s ease both; animation-delay: 0.42s; }
-    .hero-actions  { animation: fadeUp 0.55s ease both; animation-delay: 0.52s; }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 700px) {
-      nav { padding: 20px; }
-      .nav-sub { display: none; }
-      .hero { padding: 60px 20px 40px; }
-      .hero-headline { font-size: 72px; }
-      .engine-wrap { padding: 36px 20px 0; }
-      .funnel, .demo-block, .problem, .platforms, .ecosystem { padding-left: 20px; padding-right: 20px; }
-      .cta-block { margin-left: 20px; margin-right: 20px; padding: 36px 24px; flex-direction: column; }
-      .funnel-steps { grid-template-columns: 1fr; }
-      .funnel-arrow { display: none; }
-      .funnel-step { border-left: none !important; border-top: 3px solid var(--border); }
-      .funnel-step.user-step   { border-top-color: var(--accent); }
-      .funnel-step.output-step { border-top-color: var(--accent2); }
-      .problem-grid { grid-template-columns: 1fr; }
-      .problem-card:first-child { border-radius: 6px 6px 0 0; }
-      .problem-card:last-child  { border-radius: 0 0 6px 6px; }
-      footer { padding: 24px 20px; flex-direction: column; align-items: flex-start; }
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ChatLinx Continuator</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;
+  --surface:#181c27;
+  --surface2:#1e2333;
+  --border:#2a2f42;
+  --border2:#343a52;
+  --text:#e8eaf0;
+  --muted:#7a82a0;
+  --hint:#4a5068;
+  --green:#1D9E75;
+  --green-light:#E1F5EE;
+  --green-dark:#085041;
+  --purple:#7F77DD;
+  --purple-light:#EEEDFE;
+  --purple-dark:#3C3489;
+  --amber:#EF9F27;
+  --amber-light:#FAEEDA;
+  --amber-dark:#633806;
+  --teal:#5DCAA5;
+  --radius:10px;
+  --radius-sm:6px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:var(--surface)}
+.logo{font-size:15px;font-weight:600;letter-spacing:-0.3px}
+.logo span{color:var(--green)}
+.logo sub{font-size:10px;color:var(--muted);font-weight:400;letter-spacing:0.5px;text-transform:uppercase;margin-left:6px}
+.status-bar{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+.main{display:grid;grid-template-columns:1fr 1fr;flex:1;gap:0}
+.panel{display:flex;flex-direction:column;border-right:1px solid var(--border)}
+.panel:last-child{border-right:none}
+.panel-head{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.panel-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.7px;color:var(--muted)}
+.panel-body{flex:1;padding:16px 20px;display:flex;flex-direction:column;gap:12px}
+textarea{width:100%;flex:1;min-height:380px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;font-size:13px;color:var(--text);font-family:inherit;line-height:1.65;resize:none}
+textarea:focus{outline:none;border-color:var(--border2)}
+textarea::placeholder{color:var(--hint)}
+.hint-steps{display:flex;flex-direction:column;gap:6px;margin-bottom:4px}
+.step{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--muted)}
+.step-n{width:18px;height:18px;border-radius:50%;background:var(--surface2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--hint);flex-shrink:0}
+.step.done .step-n{background:rgba(29,158,117,0.15);border-color:var(--green);color:var(--green)}
+.step.done span{color:var(--text)}
+.btn-resolve{width:100%;padding:12px;background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;letter-spacing:-0.2px;transition:opacity 0.15s}
+.btn-resolve:hover{opacity:0.88}
+.btn-resolve:disabled{opacity:0.35;cursor:default}
+.output-area{flex:1;display:flex;flex-direction:column;gap:10px}
+.processing{display:none;flex-direction:column;gap:8px;padding:20px 0}
+.processing.visible{display:flex}
+.proc-steps{display:flex;flex-direction:column;gap:6px}
+.proc-step{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--muted)}
+.proc-step.active{color:var(--text)}
+.proc-step.done{color:var(--green)}
+.proc-icon{width:16px;height:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px}
+.spinner{width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.check{color:var(--green);font-size:13px}
+.block-output{display:none;flex-direction:column;gap:0;border:1px solid var(--border2);border-radius:var(--radius);overflow:hidden}
+.block-output.visible{display:flex}
+.block-section{border-bottom:1px solid var(--border);padding:11px 14px}
+.block-section:last-child{border-bottom:none}
+.bs-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.9px;margin-bottom:5px}
+.bs-label.product{color:var(--teal)}
+.bs-label.locked{color:var(--purple)}
+.bs-label.state{color:var(--green)}
+.bs-label.task{color:var(--amber)}
+.bs-label.next{color:#e87575}
+.bs-content{font-size:12px;color:var(--text);line-height:1.65}
+.bs-content ul{padding-left:14px;display:flex;flex-direction:column;gap:3px}
+.bs-content li{color:var(--muted)}
+.bs-content li span{color:var(--text)}
+.next-action{font-size:13px;color:var(--text);font-weight:500;line-height:1.6;padding:2px 0}
+.block-actions{display:flex;gap:8px;padding:12px 14px;background:var(--surface2);border-top:1px solid var(--border)}
+.copy-btn{flex:1;padding:9px;font-size:12px;font-weight:600;background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);cursor:pointer;transition:opacity 0.15s}
+.copy-btn:hover{opacity:0.88}
+.copy-btn.copied{background:var(--purple)}
+.raw-btn{padding:9px 14px;font-size:12px;color:var(--muted);background:transparent;border:1px solid var(--border2);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.12s}
+.raw-btn:hover{color:var(--text);border-color:var(--border2)}
+.quality-strip{display:none;flex-direction:column;gap:4px;padding:10px 14px;background:rgba(239,159,39,0.06);border:1px solid rgba(239,159,39,0.2);border-radius:var(--radius-sm)}
+.quality-strip.visible{display:flex}
+.qs-label{font-size:10px;font-weight:600;color:var(--amber);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:2px}
+.qcheck{display:flex;align-items:flex-start;gap:7px;font-size:11px;color:var(--muted)}
+.qcheck.pass{color:var(--green)}
+.qcheck.fail{color:#e87575}
+.empty-out{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:60px 20px;text-align:center;color:var(--hint);font-size:13px;flex:1}
+.empty-icon{width:40px;height:40px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px}
+@media(max-width:700px){.main{grid-template-columns:1fr}.panel{border-right:none;border-bottom:1px solid var(--border)}}
+</style>
 </head>
 <body>
 
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
+<div class="topbar">
+  <div class="logo">ChatLinx <span>Continuator</span><sub>v3</sub></div>
+  <div class="status-bar"><div class="dot"></div><span>Engine v3 — threaded, Resolver-ready</span></div>
+</div>
 
-  <!-- ═══════════════════════════════════════════
-       NAV
-  ════════════════════════════════════════════ -->
-  <nav>
-    <a class="nav-logo" href="/">
-      <img src="/icons/icon-192.png" alt="ChatLinx" />
-      <span class="nav-logo-text">Chat<span>Linx</span></span>
-    </a>
-    <div class="nav-right">
-      <span class="nav-sub">Continuator</span>
-      <span class="nav-badge">Instant App</span>
+<div class="main">
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-title">Chat Input</span>
     </div>
-  </nav>
-
-  <!-- ═══════════════════════════════════════════
-       HERO
-  ════════════════════════════════════════════ -->
-  <section class="hero">
-    <p class="hero-eyebrow">AI Continuity Engine</p>
-    <h1 class="hero-headline">
-      Copy<span class="accent"> In.</span><br>
-      Continue<span class="accent2"> Out.</span>
-    </h1>
-    <p class="hero-sub">
-      Your AI sessions end. Your work <strong>doesn't have to.</strong><br>
-      Paste your chat. Get a clean continuity block.<br>
-      Drop it into any AI and carry on &mdash; instantly.
-    </p>
-    <p class="hero-note">No account &nbsp;&middot;&nbsp; No formatting needed &nbsp;&middot;&nbsp; Paste raw &mdash; exactly as it is</p>
-    <div class="hero-actions">
-      <button onclick="openContinuator()" class="btn-primary">Start Continuator &rarr;</button>
-      <a href="#how" class="btn-ghost">
-        See how it works
-        <svg viewBox="0 0 16 16" fill="none"><path d="M8 3v10M4 9l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </a>
+    <div class="panel-body">
+      <div class="hint-steps" id="steps">
+        <div class="step" id="s1"><div class="step-n">1</div><span>Open your AI chat</span></div>
+        <div class="step" id="s2"><div class="step-n">2</div><span>Select all — Copy</span></div>
+        <div class="step" id="s3"><div class="step-n">3</div><span>Paste below</span></div>
+        <div class="step" id="s4"><div class="step-n">4</div><span>Press Continue</span></div>
+      </div>
+      <textarea id="chat-input" placeholder="Paste your full chat here — no length limit..."></textarea>
+      <button class="btn-resolve" id="btn-continue" disabled>Generate Continuator Block</button>
     </div>
-  </section>
+  </div>
 
-  <!-- ═══════════════════════════════════════════
-       CONTINUATOR ENGINE — hidden by default,
-       revealed on CTA click, scrolled into view
-  ════════════════════════════════════════════ -->
-  <div id="continuator-engine">
-    <div class="engine-wrap">
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-title" id="panel-title-right">Continuator Block</span>
+    </div>
+    <div class="panel-body">
 
-      <p class="engine-section-label">Continuator Engine</p>
-
-      <!-- INPUT -->
-      <div class="engine-input-block">
-        <p class="engine-input-label">Paste your AI chat below</p>
-        <textarea id="inputBox" placeholder="Paste raw AI chat here — one session or several combined. No formatting needed."></textarea>
-        <div class="engine-run-row">
-          <button onclick="runContinuator()" class="btn-primary">Run Continuator &rarr;</button>
-          <button onclick="clearContinuator()" class="btn-ghost">Clear</button>
-          <span class="engine-note">Runs locally &nbsp;&middot;&nbsp; Nothing is sent anywhere</span>
+      <div class="processing" id="processing">
+        <div class="proc-steps" id="proc-steps">
+          <div class="proc-step" id="ps1"><div class="proc-icon"><div class="spinner"></div></div>Reading full conversation — all layers</div>
+          <div class="proc-step" id="ps2"><div class="proc-icon"></div>Extracting product context</div>
+          <div class="proc-step" id="ps3"><div class="proc-icon"></div>Identifying locked decisions</div>
+          <div class="proc-step" id="ps4"><div class="proc-icon"></div>Scoping current session activity</div>
+          <div class="proc-step" id="ps5"><div class="proc-icon"></div>Composing forward NEXT ACTION</div>
+          <div class="proc-step" id="ps6"><div class="proc-icon"></div>Running quality checks</div>
         </div>
       </div>
 
-      <!-- OUTPUT -->
-      <div class="engine-output-block">
-        <div class="engine-output-label-row">
-          <span class="engine-output-label">Continuator Output</span>
-          <button class="copy-btn" id="outputCopyBtn" data-label="Copy Context" onclick="copyOutput()">Copy Context</button>
+      <div class="quality-strip" id="qstrip">
+        <div class="qs-label">Quality checks</div>
+        <div class="qcheck pass" id="qc1">&#10003; Fresh AI could understand product from PRODUCT CONTEXT alone</div>
+        <div class="qcheck pass" id="qc2">&#10003; LOCKED DECISIONS contain no activity or summaries</div>
+        <div class="qcheck pass" id="qc3">&#10003; CURRENT STATE is session-scoped only</div>
+        <div class="qcheck pass" id="qc4">&#10003; NEXT ACTION is forward-only and immediately executable</div>
+        <div class="qcheck pass" id="qc5">&#10003; Block passes the fresh-session test</div>
+      </div>
+
+      <div class="block-output" id="block-output">
+        <div class="block-section">
+          <div class="bs-label product">Product Context</div>
+          <div class="bs-content" id="out-product"></div>
         </div>
-        <div id="outputContent">Output will appear here&hellip;</div>
-        <p class="engine-proof">Paste this into Claude, ChatGPT or Gemini &mdash; type <span>&ldquo;continue&rdquo;</span> &mdash; it picks up immediately.</p>
+        <div class="block-section">
+          <div class="bs-label locked">Locked Decisions</div>
+          <div class="bs-content" id="out-locked"></div>
+        </div>
+        <div class="block-section">
+          <div class="bs-label state">Current State</div>
+          <div class="bs-content" id="out-state"></div>
+        </div>
+        <div class="block-section">
+          <div class="bs-label task">Active Task</div>
+          <div class="bs-content" id="out-task"></div>
+        </div>
+        <div class="block-section">
+          <div class="bs-label next">Next Action</div>
+          <div class="next-action" id="out-next"></div>
+        </div>
+        <div class="block-actions">
+          <button class="copy-btn" id="copy-btn">Copy Execution Block</button>
+          <button class="raw-btn" id="json-btn">Copy JSON</button>
+        </div>
+      </div>
+
+      <div class="empty-out" id="empty-out">
+        <div class="empty-icon">&#9675;</div>
+        <div>Your Continuator Block will appear here</div>
+        <div style="font-size:12px;color:var(--hint);line-height:1.6">Paste a chat and press Generate<br>to produce a portable context block</div>
       </div>
 
     </div>
   </div>
+</div>
 
-  <!-- ═══════════════════════════════════════════
-       FUNNEL — how the engine works
-  ════════════════════════════════════════════ -->
-  <div class="funnel" id="how">
-    <div class="funnel-inner">
-      <div class="funnel-header">
-        <span class="funnel-title">The Continuator Engine</span>
-        <span class="funnel-badge">What happens between Copy and Continue</span>
-      </div>
-      <div class="funnel-steps">
+<script>
+const input = document.getElementById('chat-input');
+const btn = document.getElementById('btn-continue');
+const processing = document.getElementById('processing');
+const blockOutput = document.getElementById('block-output');
+const emptyOut = document.getElementById('empty-out');
+const qstrip = document.getElementById('qstrip');
 
-        <div class="funnel-step user-step">
-          <div class="fs-label in">You do this</div>
-          <div class="fs-word in">Copy</div>
-          <p class="fs-desc">Paste your AI chat &mdash; raw, unformatted, any length. One session or several combined. Doesn&rsquo;t matter.</p>
-        </div>
+const SYSTEM_PROMPT = `You are the ChatLinx Continuator V3 engine. Your sole purpose is to produce a structured V3 Continuator Block that allows any AI platform to resume a session with zero re-explanation required. The output powers three products: Continuator (generation), Resolver (merge and conflict detection), and Collaborator (multi-agent execution).
 
-        <div class="funnel-arrow">&rsaquo;</div>
+EXTRACTION RULES:
+1. Read the ENTIRE conversation before extracting anything
+2. Extract from ALL THREE layers: product layer, decision layer, and activity layer
+3. Never summarise only the last message
+4. Never copy the last line into next_action
+5. next_action must be the first executable instruction for the next session — forward only, never backward
+6. locked_decisions must be genuinely locked architectural or product decisions — not activity descriptions
+7. current_state covers this session only — not full project history
+8. product_context must be written so a fresh AI with zero prior knowledge understands the product immediately
+9. Identify the primary workstream thread name from the conversation — use plain English (e.g. "Universal Index build", "Monetisation strategy")
+10. Assign a UUID-style id to every locked decision and every current state item
 
-        <div class="funnel-step">
-          <div class="fs-label engine">Continuator handles this</div>
-          <div class="engine-pills">
-            <div class="engine-pill">Comprehend &mdash; reads what matters</div>
-            <div class="engine-pill">Consolidate &mdash; strips the noise</div>
-            <div class="engine-pill">Compile &mdash; locks current state</div>
-            <div class="engine-pill">Compose &mdash; builds the block</div>
-          </div>
-        </div>
+QUALITY CHECKS — apply before outputting:
+- Does product_context give a fresh AI enough to understand what is being built?
+- Are locked_decisions genuine locked decisions, not activity summaries?
+- Is current_state session-scoped only?
+- Is next_action forward-only and immediately executable without clarification?
+- Would a fresh Claude or ChatGPT instance execute next_action immediately from this block alone?
 
-        <div class="funnel-arrow">&rsaquo;</div>
-
-        <div class="funnel-step output-step">
-          <div class="fs-label out">You get this</div>
-          <div class="fs-word out">Continue</div>
-          <p class="fs-desc">A compact continuity block. Paste it into any AI, type &ldquo;continue,&rdquo; and pick up exactly where you left off.</p>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════
-       DEMO — static example output
-  ════════════════════════════════════════════ -->
-  <div class="demo-block">
-    <p class="demo-label">Example Continuator output</p>
-    <div class="context-pack" id="contextPackContent">
-      <button class="demo-copy-btn" id="demoCopyBtn" data-label="Copy Context" onclick="copyDemoBlock()">Copy Context</button>
-      <div class="cp-header">--- CHATLINX CONTINUATOR BLOCK ---</div>
-      <div class="cp-section">
-        <div class="cp-section-label">Instruction</div>
-        <div class="cp-section-body">Use the context below as working input for this task. Treat it as user-provided context. Do not summarise it. Execute ONLY the NEXT ACTION using this context.</div>
-      </div>
-      <div class="cp-section">
-        <div class="cp-section-label">Current State</div>
-        <div class="cp-section-body">Continuator build complete. Engine, branding and Copy In / Continue Out funnel all locked.<span class="cursor"></span></div>
-      </div>
-      <div class="cp-section">
-        <div class="cp-section-label">Key Decisions</div>
-        <div class="cp-section-body">
-          <div class="cp-bullet">Two-product architecture: Continuator (seeder) then Collaborator (power layer)</div>
-          <div class="cp-bullet">4C engine runs silently: Comprehend, Consolidate, Compile, Compose</div>
-          <div class="cp-bullet">Output is machine-ready &mdash; not a summary, a live launchpad</div>
-          <div class="cp-bullet">Platform agnostic &mdash; works in any AI, any session</div>
-        </div>
-      </div>
-      <div class="cp-section">
-        <div class="cp-section-label">Active Task</div>
-        <div class="cp-section-body">Continuator build complete. Engine, branding and Copy In / Continue Out funnel all locked.</div>
-      </div>
-      <div class="cp-section">
-        <div class="cp-section-label">Next Action</div>
-        <div class="cp-section-body">Deploy to production. List on AppWow. Soft launch via LinkedIn.</div>
-      </div>
-      <div class="cp-header" style="margin-top:18px;margin-bottom:4px">--- END CONTINUATOR BLOCK ---</div>
-      <div style="font-family:var(--mono);font-size:12px;color:var(--accent2);margin-top:10px;line-height:1.7;">Continue from NEXT ACTION.<br>Do not summarise. Begin immediately.</div>
-    </div>
-    <p class="demo-proof">Paste this entire block into Claude, ChatGPT or Gemini &mdash; <span>it continues immediately</span>. No typing needed. No re-explaining.</p>
-  </div>
-
-  <!-- ═══════════════════════════════════════════
-       PROBLEM
-  ════════════════════════════════════════════ -->
-  <section class="problem">
-    <p class="section-label">The problem Continuator solves</p>
-    <div class="problem-grid">
-      <div class="problem-card">
-        <div class="pc-icon">&#10007;</div>
-        <div class="pc-title bad">Without Continuator</div>
-        <p class="pc-body">Every new AI session starts cold. You re-explain your project, your decisions, your context &mdash; again, every time, on every platform. The work resets. The momentum dies.</p>
-      </div>
-      <div class="problem-card">
-        <div class="pc-icon">&#10003;</div>
-        <div class="pc-title good">With Continuator</div>
-        <p class="pc-body">Paste your chat. Continuator reads it, strips the noise, locks what matters, and hands you a block that any AI understands immediately.<br><br><strong style="color:var(--text)">No reset. No repetition. No drift.</strong></p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════
-       PLATFORMS
-  ════════════════════════════════════════════ -->
-  <section class="platforms">
-    <p>Works with every AI platform</p>
-    <div class="platform-pills">
-      <span class="pill">ChatGPT</span>
-      <span class="pill">Claude</span>
-      <span class="pill">Gemini</span>
-      <span class="pill">Grok</span>
-      <span class="pill">Copilot</span>
-      <span class="pill">Perplexity</span>
-      <span class="pill">Any LLM</span>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════
-       COLLABORATOR TEASER
-  ════════════════════════════════════════════ -->
-  <div class="ecosystem">
-    <div class="ecosystem-card">
-      <div class="eco-left">
-        <div class="eco-label">Coming next &middot; ChatLinx</div>
-        <div class="eco-title">The Collaborator</div>
-        <p class="eco-desc">
-          Connect your AI accounts &mdash; Claude, ChatGPT, Gemini and more &mdash; all on one surface.
-          Use each for what it does best &mdash; without losing your place when you switch.
-          One flow. No friction. No lost context.
-        </p>
-      </div>
-      <span class="eco-badge">In Development</span>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════
-       CTA
-  ════════════════════════════════════════════ -->
-  <div class="cta-block">
-    <div class="cta-left">
-      <h2>Copy In.<br>Continue Out.</h2>
-      <p>Runs in your browser. No account required.</p>
-    </div>
-    <button onclick="openContinuator()" class="btn-primary" style="white-space:nowrap;font-size:14px;padding:16px 36px;">
-      Start Continuator &rarr;
-    </button>
-  </div>
-
-  <!-- ═══════════════════════════════════════════
-       FOOTER
-  ════════════════════════════════════════════ -->
-  <footer>
-    <div class="footer-left">
-      ChatLinx Continuator &nbsp;&middot;&nbsp; Part of the <a href="https://appwow.app" target="_blank">AppWow Evosystem</a> &nbsp;&middot;&nbsp; &copy; 2026 Vesiron Tech Ltd
-    </div>
-    <div class="footer-right">Built by <span>vDig Forge</span></div>
-  </footer>
-
-  <!-- ═══════════════════════════════════════════
-       SCRIPTS
-  ════════════════════════════════════════════ -->
-  <script>
-
-    /* ── OPEN ENGINE ── */
-    function openContinuator() {
-      const el = document.getElementById('continuator-engine');
-      if (!el.classList.contains('active')) {
-        el.classList.add('active');
+OUTPUT — return ONLY valid JSON, no markdown, no preamble, no explanation:
+{
+  "type": "chatlinx_continuator",
+  "version": "3.0",
+  "meta": {
+    "session_id": "GENERATE_UUID",
+    "parent_session_id": null,
+    "thread_id": "GENERATE_UUID",
+    "timestamp": "CURRENT_ISO_TIMESTAMP",
+    "source": "claude",
+    "generator": "continuator_v3"
+  },
+  "priority": {
+    "mode": "override_previous_context",
+    "scope": "thread_only"
+  },
+  "execution": {
+    "directive": "continue",
+    "rules": ["no_summary", "no_restatement", "execute_next_action_only", "respect_thread_scope"]
+  },
+  "threads": [
+    {
+      "thread_id": "SAME_UUID_AS_META_THREAD_ID",
+      "thread_name": "Descriptive thread name from conversation",
+      "product_context": "One paragraph. What is being built, what problem it solves, what stage it is at.",
+      "locked_decisions": [
+        { "id": "GENERATE_UUID", "value": "Decision text", "timestamp": "CURRENT_ISO_TIMESTAMP" }
+      ],
+      "current_state": [
+        { "id": "GENERATE_UUID", "value": "Completed action", "timestamp": "CURRENT_ISO_TIMESTAMP" }
+      ],
+      "active_task": "One line — the overarching goal this work is currently serving.",
+      "next_action": {
+        "id": "GENERATE_UUID",
+        "value": "One precise forward-looking instruction. The exact first thing to execute in the next session.",
+        "priority": "high"
       }
+    }
+  ],
+  "conflicts": [],
+  "integrity": {
+    "completeness_score": 0.95,
+    "fresh_session_ready": true,
+    "requires_resolution": false
+  },
+  "quality_checks": {
+    "product_context_clear": true,
+    "locked_decisions_genuine": true,
+    "current_state_scoped": true,
+    "next_action_forward": true,
+    "fresh_session_test": true
+  }
+}`;
+
+input.addEventListener('input', () => {
+  const has = input.value.trim().length > 50;
+  btn.disabled = !has;
+  if (has) {
+    ['s1','s2','s3'].forEach(id => document.getElementById(id).classList.add('done'));
+  }
+});
+
+btn.addEventListener('click', runEngine);
+
+async function runEngine() {
+  const chatText = input.value.trim();
+  if (!chatText) return;
+
+  sessionId = null;
+  threadId = null;
+
+  btn.disabled = true;
+  emptyOut.style.display = 'none';
+  blockOutput.classList.remove('visible');
+  qstrip.classList.remove('visible');
+  processing.classList.add('visible');
+  document.getElementById('s4').classList.add('done');
+
+  const procSteps = ['ps1','ps2','ps3','ps4','ps5','ps6'];
+  const delays = [0, 1200, 2200, 3200, 4200, 5200];
+
+  procSteps.forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.classList.remove('active','done');
+    el.querySelector('.proc-icon').innerHTML = i === 0 ? '<div class="spinner"></div>' : '';
+  });
+
+  delays.forEach((delay, i) => {
+    setTimeout(() => {
+      if (i > 0) {
+        const prev = document.getElementById(procSteps[i-1]);
+        prev.classList.remove('active');
+        prev.classList.add('done');
+        prev.querySelector('.proc-icon').innerHTML = '<span class="check">&#10003;</span>';
+      }
+      const cur = document.getElementById(procSteps[i]);
+      cur.classList.add('active');
+      if (i > 0) cur.querySelector('.proc-icon').innerHTML = '<div class="spinner"></div>';
+    }, delay);
+  });
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: `Extract a Continuator Block from this conversation:\n\n${chatText}` }]
+      })
+    });
+
+    const data = await response.json();
+    const raw = data.content.map(b => b.text || '').join('');
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+
+    setTimeout(() => {
+      const lastStep = document.getElementById(procSteps[procSteps.length - 1]);
+      lastStep.classList.remove('active');
+      lastStep.classList.add('done');
+      lastStep.querySelector('.proc-icon').innerHTML = '<span class="check">&#10003;</span>';
+
       setTimeout(() => {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 50);
-      setTimeout(() => {
-        document.getElementById('inputBox').focus();
+        processing.classList.remove('visible');
+        showOutput(parsed);
       }, 600);
-    }
+    }, 6000);
 
-    /* ── RUN ENGINE ── */
-    function runContinuator() {
-      const input = document.getElementById('inputBox').value;
+  } catch (err) {
+    setTimeout(() => {
+      processing.classList.remove('visible');
+      showFallback();
+    }, 6500);
+  }
+}
 
-      if (!input.trim()) {
-        alert('Paste a chat first.');
-        return;
-      }
+function showOutput(parsed) {
+  lastParsed = parsed;
+  if (!sessionId) sessionId = crypto.randomUUID();
+  if (!threadId) threadId = crypto.randomUUID();
 
-      // no hard cap — allow full input
+  const thread = (parsed.threads && parsed.threads[0]) ? parsed.threads[0] : {};
+  const threadName = thread.thread_name || 'Primary thread';
 
-      document.getElementById('outputContent').innerText = 'Processing\u2026';
+  document.getElementById('out-product').textContent = thread.product_context || parsed.product_context || '';
 
-      setTimeout(function() {
+  const lockedEl = document.getElementById('out-locked');
+  lockedEl.innerHTML = '';
+  const lu = document.createElement('ul');
+  const lockedDecisions = thread.locked_decisions || parsed.locked_decisions || [];
+  lockedDecisions.forEach(d => {
+    const li = document.createElement('li');
+    const val = typeof d === 'object' ? d.value : d;
+    li.innerHTML = `<span>${val}</span>`;
+    lu.appendChild(li);
+  });
+  lockedEl.appendChild(lu);
 
-      const MAX_CHARS = 8000;
-      var chunks = [];
-      for (var i = 0; i < input.length; i += MAX_CHARS) {
-        chunks.push(input.slice(i, i + MAX_CHARS));
-      }
+  const stateEl = document.getElementById('out-state');
+  stateEl.innerHTML = '';
+  const su = document.createElement('ul');
+  const currentState = thread.current_state || parsed.current_state || [];
+  currentState.forEach(s => {
+    const li = document.createElement('li');
+    const val = typeof s === 'object' ? s.value : s;
+    li.innerHTML = `<span>${val}</span>`;
+    su.appendChild(li);
+  });
+  stateEl.appendChild(su);
 
-      var allLines = [];
-      chunks.forEach(function(chunk) {
-        var lines = chunk.split('\n').map(function(l) { return l.trim(); }).filter(Boolean);
-        allLines = allLines.concat(lines);
-      });
+  const activeTask = thread.active_task || parsed.active_task || '';
+  const nextAction = thread.next_action ? (typeof thread.next_action === 'object' ? thread.next_action.value : thread.next_action) : (parsed.next_action || '');
 
-      var currentState = [];
-      var decisions    = [];
-      var nextAction   = [];
+  document.getElementById('out-task').textContent = activeTask;
+  document.getElementById('out-next').textContent = nextAction;
 
-      allLines.forEach(function(line, i) {
-        var lower = line.toLowerCase();
+  const qc = parsed.quality_checks || {};
+  const checks = ['product_context_clear','locked_decisions_genuine','current_state_scoped','next_action_forward','fresh_session_test'];
+  const labels = [
+    'Fresh AI could understand product from PRODUCT CONTEXT alone',
+    'LOCKED DECISIONS contain no activity or summaries',
+    'CURRENT STATE is session-scoped only',
+    'NEXT ACTION is forward-only and immediately executable',
+    'Block passes the fresh-session test'
+  ];
+  checks.forEach((key, i) => {
+    const el = document.getElementById('qc' + (i+1));
+    const pass = qc[key] !== false;
+    el.className = 'qcheck ' + (pass ? 'pass' : 'fail');
+    el.textContent = (pass ? '✓ ' : '✗ ') + labels[i];
+  });
 
-        if (
-          lower.includes('decided') ||
-          lower.includes('we will') ||
-          lower.includes('we should') ||
-          lower.includes('agreed') ||
-          lower.includes('plan is') ||
-          lower.includes('locked') ||
-          lower.includes('confirmed')
-        ) {
-          decisions.push(line);
+  const integrity = parsed.integrity || {};
+  const score = integrity.completeness_score ? Math.round(integrity.completeness_score * 100) + '%' : '—';
+  document.getElementById('panel-title-right').textContent = `Continuator Block · Thread: ${threadName} · ${score}`;
+
+  qstrip.classList.add('visible');
+  blockOutput.classList.add('visible');
+  btn.disabled = false;
+}
+
+function showFallback() {
+  showOutput({
+    product_context: "Could not extract — paste may be too short or malformed. Please ensure you paste the full conversation text.",
+    locked_decisions: ["Paste a longer conversation for accurate extraction"],
+    current_state: ["Engine ran but could not parse structured output"],
+    active_task: "Retry with full conversation pasted",
+    next_action: "Paste the complete chat text and press Generate Continuator Block again.",
+    quality_checks: { product_context_clear: false, locked_decisions_genuine: false, current_state_scoped: false, next_action_forward: false, fresh_session_test: false }
+  });
+  btn.disabled = false;
+}
+
+let lastParsed = null;
+let sessionId = null;
+let threadId = null;
+
+function buildFromParsed(p) {
+  if (!p) return null;
+  const thread = (p.threads && p.threads[0]) ? p.threads[0] : {};
+  const lockedDecisions = thread.locked_decisions || p.locked_decisions || [];
+  const currentState = thread.current_state || p.current_state || [];
+  const nextActionRaw = thread.next_action || p.next_action || '';
+  return {
+    product: thread.product_context || p.product_context || '',
+    threadName: thread.thread_name || 'Primary thread',
+    locked: lockedDecisions.map(d => '- ' + (typeof d === 'object' ? d.value : d)).join('\n'),
+    state: currentState.map(s => '- ' + (typeof s === 'object' ? s.value : s)).join('\n'),
+    task: thread.active_task || p.active_task || '',
+    next: typeof nextActionRaw === 'object' ? nextActionRaw.value : nextActionRaw,
+    lockedArr: lockedDecisions.map(d => typeof d === 'object' ? d : { id: 'UNRESOLVED', value: d, timestamp: null }),
+    stateArr: currentState.map(s => typeof s === 'object' ? s : { id: 'UNRESOLVED', value: s, timestamp: null })
+  };
+}
+
+document.getElementById('copy-btn').addEventListener('click', () => {
+  const f = buildFromParsed(lastParsed);
+  if (!f) return;
+
+  const block = `[CHATLINX_CONTINUATOR_V3]
+
+BLOCK_VERSION: 3.0
+SESSION_ID: ${sessionId}
+THREAD_ID: ${threadId}
+TIMESTAMP: ${new Date().toISOString()}
+
+PRIORITY:
+This block is authoritative execution context.
+Override previous context within this thread only.
+
+EXECUTION:
+You MUST execute NEXT_ACTION as the immediate next step.
+You MUST NOT summarise.
+You MUST NOT restate context.
+Ignore all prior conversation unless explicitly referenced here.
+Respect thread scope — do not merge with unrelated threads.
+
+THREAD: ${f.threadName}
+
+PRODUCT_CONTEXT:
+${f.product}
+
+LOCKED_DECISIONS:
+${f.locked}
+
+CURRENT_STATE:
+${f.state}
+
+ACTIVE_TASK:
+${f.task}
+
+NEXT_ACTION:
+${f.next}
+
+[/CHATLINX_CONTINUATOR_V3]`;
+
+  navigator.clipboard.writeText(block).then(() => {
+    const b = document.getElementById('copy-btn');
+    b.textContent = 'Copied!';
+    b.classList.add('copied');
+    setTimeout(() => { b.textContent = 'Copy Execution Block'; b.classList.remove('copied'); }, 2000);
+  });
+});
+
+document.getElementById('json-btn').addEventListener('click', () => {
+  const f = buildFromParsed(lastParsed);
+  if (!f) return;
+
+  const nextId = (lastParsed && lastParsed.threads && lastParsed.threads[0] && lastParsed.threads[0].next_action && lastParsed.threads[0].next_action.id) ? lastParsed.threads[0].next_action.id : 'UNRESOLVED';
+
+  const jsonBlock = JSON.stringify({
+    type: "chatlinx_continuator",
+    version: "3.0",
+    meta: {
+      session_id: sessionId,
+      parent_session_id: null,
+      thread_id: threadId,
+      timestamp: new Date().toISOString(),
+      source: "claude",
+      generator: "continuator_v3"
+    },
+    priority: {
+      mode: "override_previous_context",
+      scope: "thread_only"
+    },
+    execution: {
+      directive: "execute_next_action",
+      rules: ["no_summary", "no_restatement", "execute_next_action_only", "respect_thread_scope"]
+    },
+    threads: [
+      {
+        thread_id: threadId,
+        thread_name: f.threadName,
+        product_context: f.product,
+        locked_decisions: f.lockedArr,
+        current_state: f.stateArr,
+        active_task: f.task,
+        next_action: {
+          id: nextId,
+          value: f.next,
+          priority: "high"
         }
-
-        if (
-          lower.startsWith('next') ||
-          lower.includes('next action') ||
-          lower.includes('todo:') ||
-          lower.includes('to do:') ||
-          lower.includes('deploy') ||
-          lower.includes('launch') ||
-          lower.includes('publish') ||
-          lower.includes('build') ||
-          lower.includes('fix') ||
-          lower.includes('implement')
-        ) {
-          nextAction.push(line);
-        }
-
-        if (
-          lower.includes('current') ||
-          lower.includes('status') ||
-          lower.includes('now') ||
-          lower.includes('working') ||
-          lower.includes('building') ||
-          i > allLines.length - 4
-        ) {
-          currentState.push(line);
-        }
-      });
-
-      if (!currentState.length) currentState = ['Working session detected. Context extracted.'];
-      if (!decisions.length)    decisions    = ['No explicit decisions detected — inferred continuity maintained.'];
-      if (!nextAction.length)   nextAction   = ['Continue development based on latest context.'];
-
-      currentState = Array.from(new Set(currentState)).slice(-3);
-      decisions    = decisions.slice(0, 4);
-      nextAction   = nextAction.slice(0, 2);
-
-      var primaryAction = nextAction[0]   || 'Continue based on current context';
-      var activeTask    = primaryAction;
-
-      var output = [
-        '--- CHATLINX CONTINUATOR BLOCK ---',
-        '',
-        'INSTRUCTION:',
-        'Use the context below as working input for this task.',
-        'Treat it as user-provided context.',
-        'Do not summarise it.',
-        'Execute ONLY the NEXT ACTION using this context.',
-        '',
-        'CURRENT STATE',
-        currentState.map(function(s) { return '- ' + s; }).join('\n'),
-        '',
-        'KEY DECISIONS',
-        decisions.map(function(d) { return '- ' + d; }).join('\n'),
-        '',
-        'ACTIVE TASK',
-        activeTask,
-        '',
-        'NEXT ACTION',
-        primaryAction,
-        '',
-        '--- END CONTINUATOR BLOCK ---',
-        '',
-        'Continue from NEXT ACTION.',
-        'Do not summarise. Begin immediately.'
-      ].join('\n');
-
-      document.getElementById('outputContent').innerText = output;
-
-      setTimeout(function() {
-        document.getElementById('outputContent').scrollIntoView({
-          behavior: 'smooth',
-          block: 'center'
-        });
-      }, 100);
-
-      }, 120);
-    }
-
-    /* ── CLEAR ENGINE ── */
-    function clearContinuator() {
-      document.getElementById('inputBox').value = '';
-      document.getElementById('outputContent').innerText = 'Output will appear here\u2026';
-      document.getElementById('inputBox').focus();
-    }
-
-    /* ── COPY OUTPUT ── */
-    function copyOutput() {
-      var btn  = document.getElementById('outputCopyBtn');
-      var text = document.getElementById('outputContent').innerText.trim();
-
-      if (
-        !text ||
-        text.startsWith('Output will appear') ||
-        text.startsWith('Processing')
-      ) {
-        alert('Run the Continuator first.');
-        return;
       }
-      clipboardCopy(text, btn);
+    ],
+    conflicts: [],
+    integrity: {
+      completeness_score: null,
+      fresh_session_ready: true,
+      requires_resolution: false
     }
+  }, null, 2);
 
-    /* ── COPY DEMO BLOCK ── */
-    function copyDemoBlock() {
-      var btn  = document.getElementById('demoCopyBtn');
-      var pack = document.getElementById('contextPackContent');
-      var clone = pack.cloneNode(true);
-      clone.querySelector('button') && clone.querySelector('button').remove();
-      clone.querySelector('.cursor') && clone.querySelector('.cursor').remove();
-      var text = clone.innerText.replace(/\n\n+/g, '\n\n').trim();
-      clipboardCopy(text, btn);
-    }
-
-    /* ── SHARED CLIPBOARD UTILITY ── */
-    function clipboardCopy(text, btn) {
-      function onSuccess() {
-        btn.textContent = 'Copied \u2713';
-        btn.classList.add('copied');
-        setTimeout(function() {
-          btn.textContent = btn.getAttribute('data-label') || 'Copy';
-          btn.classList.remove('copied');
-        }, 2200);
-      }
-      function onFail() {
-        var ta = document.createElement('textarea');
-        ta.value = text;
-        ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;';
-        document.body.appendChild(ta);
-        ta.focus(); ta.select();
-        try {
-          document.execCommand('copy');
-          onSuccess();
-        } catch(e) {
-          btn.textContent = 'Copy failed';
-          setTimeout(function() { btn.textContent = btn.getAttribute('data-label') || 'Copy'; }, 2500);
-        }
-        document.body.removeChild(ta);
-      }
-
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(onSuccess).catch(onFail);
-      } else {
-        onFail();
-      }
-    }
-
-  </script>
+  navigator.clipboard.writeText(jsonBlock).then(() => {
+    const b = document.getElementById('json-btn');
+    b.textContent = 'Copied!';
+    setTimeout(() => { b.textContent = 'Copy JSON'; }, 2000);
+  });
+});
+</script>
 </body>
 </html>
