@@ -99,6 +99,17 @@ textarea::placeholder{color:var(--hint)}
 .protocol-bar span.hi{color:var(--green);border-color:rgba(29,158,117,0.35);background:rgba(29,158,117,0.07)}
 .empty-out{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:60px 20px;text-align:center;color:var(--hint);font-size:13px;flex:1}
 .empty-icon{width:40px;height:40px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px}
+
+/* API key config bar */
+.api-bar{background:var(--surface2);border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;gap:10px}
+.api-bar label{font-size:11px;color:var(--muted);white-space:nowrap;letter-spacing:0.3px}
+.api-bar input{flex:1;background:var(--bg);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:6px 10px;font-size:12px;color:var(--text);font-family:inherit;outline:none}
+.api-bar input:focus{border-color:var(--green)}
+.api-bar input::placeholder{color:var(--hint)}
+.api-status{font-size:11px;white-space:nowrap}
+.api-status.ok{color:var(--green)}
+.api-status.missing{color:#e87575}
+
 @media(max-width:700px){.main{grid-template-columns:1fr}.panel{border-right:none;border-bottom:1px solid var(--border)}}
 </style>
 </head>
@@ -107,6 +118,18 @@ textarea::placeholder{color:var(--hint)}
 <div class="topbar">
   <div class="logo">ChatLinx <span>Continuator</span><sub>v3</sub></div>
   <div class="status-bar"><div class="dot"></div><span>Engine v3 — threaded, Resolver-ready</span></div>
+</div>
+
+<!-- API KEY WARNING -->
+<div style="font-size:11px;color:#e87575;padding:6px 24px;background:#1e2333;border-bottom:1px solid #2a2f42">
+  &#9888; Your API key is used locally in your browser. Do not use a sensitive or high-credit key.
+</div>
+
+<!-- API KEY BAR -->
+<div class="api-bar">
+  <label>Anthropic API Key</label>
+  <input type="password" id="api-key-input" placeholder="sk-ant-..." autocomplete="off" />
+  <span class="api-status missing" id="api-status">Key required</span>
 </div>
 
 <div class="main">
@@ -157,11 +180,11 @@ textarea::placeholder{color:var(--hint)}
 
       <div class="quality-strip" id="qstrip">
         <div class="qs-label">Quality checks</div>
-        <div class="qcheck pass" id="qc1">&#10003; Fresh AI could understand product from PRODUCT CONTEXT alone</div>
-        <div class="qcheck pass" id="qc2">&#10003; LOCKED DECISIONS contain no activity or summaries</div>
-        <div class="qcheck pass" id="qc3">&#10003; CURRENT STATE is session-scoped only</div>
-        <div class="qcheck pass" id="qc4">&#10003; NEXT ACTION is forward-only and immediately executable</div>
-        <div class="qcheck pass" id="qc5">&#10003; Block passes the fresh-session test</div>
+        <div class="qcheck" id="qc1">&#10003; Fresh AI could understand product from PRODUCT CONTEXT alone</div>
+        <div class="qcheck" id="qc2">&#10003; LOCKED DECISIONS contain no activity or summaries</div>
+        <div class="qcheck" id="qc3">&#10003; CURRENT STATE is session-scoped only</div>
+        <div class="qcheck" id="qc4">&#10003; NEXT ACTION is forward-only and immediately executable</div>
+        <div class="qcheck" id="qc5">&#10003; Block passes the fresh-session test</div>
       </div>
 
       <div class="block-output" id="block-output">
@@ -202,14 +225,64 @@ textarea::placeholder{color:var(--hint)}
 </div>
 
 <script>
-const input = document.getElementById('chat-input');
-const btn = document.getElementById('btn-continue');
-const processing = document.getElementById('processing');
+const input    = document.getElementById('chat-input');
+const btn      = document.getElementById('btn-continue');
+const processing  = document.getElementById('processing');
 const blockOutput = document.getElementById('block-output');
-const emptyOut = document.getElementById('empty-out');
-const qstrip = document.getElementById('qstrip');
+const emptyOut    = document.getElementById('empty-out');
+const qstrip      = document.getElementById('qstrip');
+const apiKeyInput = document.getElementById('api-key-input');
+const apiStatus   = document.getElementById('api-status');
 
-const SYSTEM_PROMPT = `You are the ChatLinx Continuator V3 engine. Your sole purpose is to produce a structured V3 Continuator Block that allows any AI platform to resume a session with zero re-explanation required. The output powers three products: Continuator (generation), Resolver (merge and conflict detection), and Collaborator (multi-agent execution).
+/* ── API KEY HANDLING ── */
+// Load saved key from localStorage if present
+if (localStorage.getItem('cl_api_key')) {
+  apiKeyInput.value = localStorage.getItem('cl_api_key');
+  apiStatus.textContent = 'Key saved';
+  apiStatus.className = 'api-status ok';
+  updateBtn();
+}
+
+apiKeyInput.addEventListener('input', () => {
+  const v = apiKeyInput.value.trim();
+  if (v.startsWith('sk-ant-') && v.length > 20) {
+    localStorage.setItem('cl_api_key', v);
+    apiStatus.textContent = 'Key saved';
+    apiStatus.className = 'api-status ok';
+  } else if (v.length === 0) {
+    localStorage.removeItem('cl_api_key');
+    apiStatus.textContent = 'Key required';
+    apiStatus.className = 'api-status missing';
+  } else {
+    apiStatus.textContent = 'Checking…';
+    apiStatus.className = 'api-status missing';
+  }
+  updateBtn();
+});
+
+function getApiKey() {
+  return apiKeyInput.value.trim();
+}
+
+function updateBtn() {
+  const hasText = input.value.trim().length > 50;
+  const hasKey  = getApiKey().startsWith('sk-ant-');
+  btn.disabled  = !(hasText && hasKey);
+}
+
+/* ── INPUT HANDLING ── */
+input.addEventListener('input', () => {
+  const has = input.value.trim().length > 50;
+  if (has) {
+    ['s1','s2','s3'].forEach(id => document.getElementById(id).classList.add('done'));
+  }
+  updateBtn();
+});
+
+btn.addEventListener('click', runEngine);
+
+/* ── SYSTEM PROMPT ── */
+const SYSTEM_PROMPT = `You are the ChatLinx Continuator V3 engine. Your sole purpose is to produce a structured V3 Continuator Block that allows any AI platform to resume a session with zero re-explanation required.
 
 EXTRACTION RULES:
 1. Read the ENTIRE conversation before extracting anything
@@ -220,7 +293,7 @@ EXTRACTION RULES:
 6. locked_decisions must be genuinely locked architectural or product decisions — not activity descriptions
 7. current_state covers this session only — not full project history
 8. product_context must be written so a fresh AI with zero prior knowledge understands the product immediately
-9. Identify the primary workstream thread name from the conversation — use plain English (e.g. "Universal Index build", "Monetisation strategy")
+9. Identify the primary workstream thread name from the conversation
 10. Assign a UUID-style id to every locked decision and every current state item
 
 QUALITY CHECKS — apply before outputting:
@@ -228,7 +301,6 @@ QUALITY CHECKS — apply before outputting:
 - Are locked_decisions genuine locked decisions, not activity summaries?
 - Is current_state session-scoped only?
 - Is next_action forward-only and immediately executable without clarification?
-- Would a fresh Claude or ChatGPT instance execute next_action immediately from this block alone?
 
 OUTPUT — return ONLY valid JSON, no markdown, no preamble, no explanation:
 {
@@ -236,30 +308,20 @@ OUTPUT — return ONLY valid JSON, no markdown, no preamble, no explanation:
   "version": "3.0",
   "meta": {
     "session_id": "GENERATE_UUID",
-    "parent_session_id": null,
     "thread_id": "GENERATE_UUID",
     "timestamp": "CURRENT_ISO_TIMESTAMP",
-    "source": "claude",
     "generator": "continuator_v3"
-  },
-  "priority": {
-    "mode": "override_previous_context",
-    "scope": "thread_only"
-  },
-  "execution": {
-    "directive": "continue",
-    "rules": ["no_summary", "no_restatement", "execute_next_action_only", "respect_thread_scope"]
   },
   "threads": [
     {
       "thread_id": "SAME_UUID_AS_META_THREAD_ID",
       "thread_name": "Descriptive thread name from conversation",
-      "product_context": "One paragraph. What is being built, what problem it solves, what stage it is at.",
+      "product_context": "One paragraph describing what is being built, what problem it solves, what stage it is at.",
       "locked_decisions": [
         { "id": "GENERATE_UUID", "value": "Decision text", "timestamp": "CURRENT_ISO_TIMESTAMP" }
       ],
       "current_state": [
-        { "id": "GENERATE_UUID", "value": "Completed action", "timestamp": "CURRENT_ISO_TIMESTAMP" }
+        { "id": "GENERATE_UUID", "value": "Completed action or current status", "timestamp": "CURRENT_ISO_TIMESTAMP" }
       ],
       "active_task": "One line — the overarching goal this work is currently serving.",
       "next_action": {
@@ -269,7 +331,6 @@ OUTPUT — return ONLY valid JSON, no markdown, no preamble, no explanation:
       }
     }
   ],
-  "conflicts": [],
   "integrity": {
     "completeness_score": 0.95,
     "fresh_session_ready": true,
@@ -284,24 +345,18 @@ OUTPUT — return ONLY valid JSON, no markdown, no preamble, no explanation:
   }
 }`;
 
-input.addEventListener('input', () => {
-  const has = input.value.trim().length > 50;
-  btn.disabled = !has;
-  if (has) {
-    ['s1','s2','s3'].forEach(id => document.getElementById(id).classList.add('done'));
-  }
-});
-
-btn.addEventListener('click', runEngine);
-
+/* ── MAIN ENGINE ── */
 async function runEngine() {
   const chatText = input.value.trim();
+  const apiKey   = getApiKey();
+
   if (!chatText) return;
+  if (!apiKey) { alert('Enter your Anthropic API key first.'); return; }
 
   sessionId = null;
-  threadId = null;
+  threadId  = null;
   document.getElementById('thread-header').style.display = 'none';
-  document.getElementById('protocol-bar').style.display = 'none';
+  document.getElementById('protocol-bar').style.display  = 'none';
 
   btn.disabled = true;
   emptyOut.style.display = 'none';
@@ -311,7 +366,7 @@ async function runEngine() {
   document.getElementById('s4').classList.add('done');
 
   const procSteps = ['ps1','ps2','ps3','ps4','ps5','ps6'];
-  const delays = [0, 1200, 2200, 3200, 4200, 5200];
+  const delays    = [0, 1200, 2200, 3200, 4200, 5200];
 
   procSteps.forEach((id, i) => {
     const el = document.getElementById(id);
@@ -333,36 +388,68 @@ async function runEngine() {
     }, delay);
   });
 
+  let data = null;
+
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'anthropic-version': '2023-06-01'
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 1200,
+        max_tokens: 2000,
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: `Extract a Continuator Block from this conversation:\n\n${chatText}` }]
       })
     });
 
-    if (!response.ok) throw new Error('API error: ' + response.status);
+    if (!response.ok) {
+      const errBody = await response.text();
+      console.error('API HTTP error:', response.status, errBody);
+      throw new Error('API error: ' + response.status);
+    }
 
-    const data = await response.json();
-    const raw = data.content.map(b => b.text || '').join('');
+    data = await response.json();
+    console.log('API response received:', data);
+
+    /* ── FIX 1: hardened response extraction ── */
+    let raw = '';
+    if (data && data.content && Array.isArray(data.content)) {
+      raw = data.content
+        .map(function(block) {
+          if (block.type === 'text') return block.text;
+          return '';
+        })
+        .join('');
+    }
+
+    if (!raw || raw.trim().length < 10) {
+      console.error('Empty or near-empty response. Full data:', JSON.stringify(data));
+      throw new Error('Empty or invalid response from Claude');
+    }
 
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('No JSON found in response');
+    if (!jsonMatch) {
+      console.error('No JSON found in raw response:', raw);
+      throw new Error('No JSON found in response');
+    }
 
     let parsed;
     try {
       parsed = JSON.parse(jsonMatch[0]);
     } catch(e) {
       console.error('JSON parse error:', e);
-      console.log('RAW RESPONSE:', raw);
+      console.error('Raw response was:', raw);
       throw new Error('Invalid JSON structure');
+    }
+
+    if (!parsed || !parsed.threads || !parsed.threads.length) {
+      console.error('Structured extraction failed — no threads in response:', parsed);
+      throw new Error('Structured extraction failed');
     }
 
     setTimeout(() => {
@@ -370,7 +457,6 @@ async function runEngine() {
       lastStep.classList.remove('active');
       lastStep.classList.add('done');
       lastStep.querySelector('.proc-icon').innerHTML = '<span class="check">&#10003;</span>';
-
       setTimeout(() => {
         processing.classList.remove('visible');
         showOutput(parsed);
@@ -378,19 +464,24 @@ async function runEngine() {
     }, 6000);
 
   } catch (err) {
+    /* ── FIX 2: error logging ── */
+    console.error('Continuator engine error:', err);
+    if (data) console.error('Last API response:', JSON.stringify(data));
+
     setTimeout(() => {
       processing.classList.remove('visible');
-      showFallback();
+      showFallback(err.message);
     }, 6500);
   }
 }
 
+/* ── OUTPUT RENDERER ── */
 function showOutput(parsed) {
   lastParsed = parsed;
   if (!sessionId) sessionId = crypto.randomUUID();
-  if (!threadId) threadId = crypto.randomUUID();
+  if (!threadId)  threadId  = crypto.randomUUID();
 
-  const thread = (parsed.threads && parsed.threads[0]) ? parsed.threads[0] : {};
+  const thread     = (parsed.threads && parsed.threads[0]) ? parsed.threads[0] : {};
   const threadName = thread.thread_name || 'Primary thread';
 
   document.getElementById('out-product').textContent = thread.product_context || parsed.product_context || '';
@@ -401,8 +492,7 @@ function showOutput(parsed) {
   const lockedDecisions = thread.locked_decisions || parsed.locked_decisions || [];
   lockedDecisions.forEach(d => {
     const li = document.createElement('li');
-    const val = typeof d === 'object' ? d.value : d;
-    li.innerHTML = `<span>${val}</span>`;
+    li.innerHTML = `<span>${typeof d === 'object' ? d.value : d}</span>`;
     lu.appendChild(li);
   });
   lockedEl.appendChild(lu);
@@ -413,19 +503,19 @@ function showOutput(parsed) {
   const currentState = thread.current_state || parsed.current_state || [];
   currentState.forEach(s => {
     const li = document.createElement('li');
-    const val = typeof s === 'object' ? s.value : s;
-    li.innerHTML = `<span>${val}</span>`;
+    li.innerHTML = `<span>${typeof s === 'object' ? s.value : s}</span>`;
     su.appendChild(li);
   });
   stateEl.appendChild(su);
 
-  const activeTask = thread.active_task || parsed.active_task || '';
-  const nextAction = thread.next_action ? (typeof thread.next_action === 'object' ? thread.next_action.value : thread.next_action) : (parsed.next_action || '');
+  const activeTask  = thread.active_task || parsed.active_task || '';
+  const nextRaw     = thread.next_action || parsed.next_action || '';
+  const nextAction  = typeof nextRaw === 'object' ? nextRaw.value : nextRaw;
 
   document.getElementById('out-task').textContent = activeTask;
   document.getElementById('out-next').textContent = nextAction;
 
-  const qc = parsed.quality_checks || {};
+  const qc     = parsed.quality_checks || {};
   const checks = ['product_context_clear','locked_decisions_genuine','current_state_scoped','next_action_forward','fresh_session_test'];
   const labels = [
     'Fresh AI could understand product from PRODUCT CONTEXT alone',
@@ -435,63 +525,71 @@ function showOutput(parsed) {
     'Block passes the fresh-session test'
   ];
   checks.forEach((key, i) => {
-    const el = document.getElementById('qc' + (i+1));
+    const el   = document.getElementById('qc' + (i+1));
     const pass = qc[key] !== false;
-    el.className = 'qcheck ' + (pass ? 'pass' : 'fail');
+    el.className  = 'qcheck ' + (pass ? 'pass' : 'fail');
     el.textContent = (pass ? '✓ ' : '✗ ') + labels[i];
   });
 
   const integrity = parsed.integrity || {};
-  const score = integrity.completeness_score !== null && integrity.completeness_score !== undefined ? Math.round(integrity.completeness_score * 100) + '%' : '—';
-  document.getElementById('panel-title-right').textContent = 'Continuator Block';
+  const score     = (integrity.completeness_score !== null && integrity.completeness_score !== undefined)
+                    ? Math.round(integrity.completeness_score * 100) + '%' : '—';
 
-  const threadHeader = document.getElementById('thread-header');
-  const protocolBar = document.getElementById('protocol-bar');
   document.getElementById('thread-name-display').textContent = threadName;
-  document.getElementById('thread-meta-text').textContent = `Thread · Session ${sessionId.slice(0,8)} · Resolver-ready`;
-  document.getElementById('integrity-tag').textContent = `Integrity: ${score}`;
-  threadHeader.style.display = 'block';
-  protocolBar.style.display = 'flex';
+  document.getElementById('thread-meta-text').textContent    = `Thread · Session ${sessionId.slice(0,8)} · Resolver-ready`;
+  document.getElementById('integrity-tag').textContent       = `Integrity: ${score}`;
+  document.getElementById('thread-header').style.display     = 'block';
+  document.getElementById('protocol-bar').style.display      = 'flex';
 
   qstrip.classList.add('visible');
   blockOutput.classList.add('visible');
   btn.disabled = false;
 }
 
-function showFallback() {
+/* ── FALLBACK ── */
+function showFallback(reason) {
+  const msg = reason ? `Engine error: ${reason}` : 'Could not extract — paste may be too short or malformed.';
   showOutput({
-    product_context: "Could not extract — paste may be too short or malformed. Please ensure you paste the full conversation text.",
-    locked_decisions: ["Paste a longer conversation for accurate extraction"],
-    current_state: ["Engine ran but could not parse structured output"],
-    active_task: "Retry with full conversation pasted",
-    next_action: "Paste the complete chat text and press Generate Continuator Block again.",
-    quality_checks: { product_context_clear: false, locked_decisions_genuine: false, current_state_scoped: false, next_action_forward: false, fresh_session_test: false }
+    product_context:  msg + ' Please ensure you paste the full conversation text.',
+    locked_decisions: ['Paste a longer conversation for accurate extraction'],
+    current_state:    ['Engine ran but could not parse structured output'],
+    active_task:      'Retry with full conversation pasted',
+    next_action:      'Paste the complete chat text and press Generate Continuator Block again.',
+    quality_checks: {
+      product_context_clear: false,
+      locked_decisions_genuine: false,
+      current_state_scoped: false,
+      next_action_forward: false,
+      fresh_session_test: false
+    }
   });
   btn.disabled = false;
 }
 
+/* ── STATE ── */
 let lastParsed = null;
-let sessionId = null;
-let threadId = null;
+let sessionId  = null;
+let threadId   = null;
 
 function buildFromParsed(p) {
   if (!p) return null;
   const thread = (p.threads && p.threads[0]) ? p.threads[0] : {};
   const lockedDecisions = thread.locked_decisions || p.locked_decisions || [];
-  const currentState = thread.current_state || p.current_state || [];
-  const nextActionRaw = thread.next_action || p.next_action || '';
+  const currentState    = thread.current_state    || p.current_state    || [];
+  const nextActionRaw   = thread.next_action       || p.next_action       || '';
   return {
-    product: thread.product_context || p.product_context || '',
-    threadName: thread.thread_name || 'Primary thread',
-    locked: lockedDecisions.map(d => '- ' + (typeof d === 'object' ? d.value : d)).join('\n'),
-    state: currentState.map(s => '- ' + (typeof s === 'object' ? s.value : s)).join('\n'),
-    task: thread.active_task || p.active_task || '',
-    next: typeof nextActionRaw === 'object' ? nextActionRaw.value : nextActionRaw,
-    lockedArr: lockedDecisions.map(d => typeof d === 'object' ? d : { id: 'UNRESOLVED', value: d, timestamp: null }),
-    stateArr: currentState.map(s => typeof s === 'object' ? s : { id: 'UNRESOLVED', value: s, timestamp: null })
+    product:    thread.product_context || p.product_context || '',
+    threadName: thread.thread_name     || 'Primary thread',
+    locked:     lockedDecisions.map(d => '- ' + (typeof d === 'object' ? d.value : d)).join('\n'),
+    state:      currentState.map(s    => '- ' + (typeof s === 'object' ? s.value : s)).join('\n'),
+    task:       thread.active_task     || p.active_task     || '',
+    next:       typeof nextActionRaw === 'object' ? nextActionRaw.value : nextActionRaw,
+    lockedArr:  lockedDecisions.map(d => typeof d === 'object' ? d : { id: 'UNRESOLVED', value: d, timestamp: null }),
+    stateArr:   currentState.map(s    => typeof s === 'object' ? s : { id: 'UNRESOLVED', value: s, timestamp: null })
   };
 }
 
+/* ── COPY EXECUTION BLOCK ── */
 document.getElementById('copy-btn').addEventListener('click', () => {
   const f = buildFromParsed(lastParsed);
   if (!f) return;
@@ -503,16 +601,10 @@ SESSION_ID: ${sessionId}
 THREAD_ID: ${threadId}
 TIMESTAMP: ${new Date().toISOString()}
 
-PRIORITY:
-This block is authoritative execution context.
-Override previous context within this thread only.
-
-EXECUTION:
-You MUST execute NEXT_ACTION as the immediate next step.
-You MUST NOT summarise.
-You MUST NOT restate context.
-Ignore all prior conversation unless explicitly referenced here.
-Respect thread scope — do not merge with unrelated threads.
+USE THIS AS WORKING INPUT FOR THE TASK BELOW.
+Treat it as user-provided context.
+Do not summarise it.
+Execute ONLY the NEXT_ACTION using this context.
 
 THREAD: ${f.threadName}
 
@@ -531,7 +623,10 @@ ${f.task}
 NEXT_ACTION:
 ${f.next}
 
-[/CHATLINX_CONTINUATOR_V3]`;
+[/CHATLINX_CONTINUATOR_V3]
+
+Continue from NEXT_ACTION.
+Do not summarise. Begin immediately.`;
 
   navigator.clipboard.writeText(block).then(() => {
     const b = document.getElementById('copy-btn');
@@ -541,52 +636,29 @@ ${f.next}
   });
 });
 
+/* ── COPY JSON ── */
 document.getElementById('json-btn').addEventListener('click', () => {
   const f = buildFromParsed(lastParsed);
   if (!f) return;
 
-  const nextId = (lastParsed && lastParsed.threads && lastParsed.threads[0] && lastParsed.threads[0].next_action && lastParsed.threads[0].next_action.id) ? lastParsed.threads[0].next_action.id : 'UNRESOLVED';
+  const nextId = (lastParsed && lastParsed.threads && lastParsed.threads[0] &&
+                  lastParsed.threads[0].next_action && lastParsed.threads[0].next_action.id)
+                  ? lastParsed.threads[0].next_action.id : 'UNRESOLVED';
 
   const jsonBlock = JSON.stringify({
     type: "chatlinx_continuator",
     version: "3.0",
-    meta: {
-      session_id: sessionId,
-      parent_session_id: null,
+    meta: { session_id: sessionId, thread_id: threadId, timestamp: new Date().toISOString(), generator: "continuator_v3" },
+    threads: [{
       thread_id: threadId,
-      timestamp: new Date().toISOString(),
-      source: "claude",
-      generator: "continuator_v3"
-    },
-    priority: {
-      mode: "override_previous_context",
-      scope: "thread_only"
-    },
-    execution: {
-      directive: "execute_next_action",
-      rules: ["no_summary", "no_restatement", "execute_next_action_only", "respect_thread_scope"]
-    },
-    threads: [
-      {
-        thread_id: threadId,
-        thread_name: f.threadName,
-        product_context: f.product,
-        locked_decisions: f.lockedArr,
-        current_state: f.stateArr,
-        active_task: f.task,
-        next_action: {
-          id: nextId,
-          value: f.next,
-          priority: "high"
-        }
-      }
-    ],
-    conflicts: [],
-    integrity: {
-      completeness_score: null,
-      fresh_session_ready: true,
-      requires_resolution: false
-    }
+      thread_name: f.threadName,
+      product_context: f.product,
+      locked_decisions: f.lockedArr,
+      current_state: f.stateArr,
+      active_task: f.task,
+      next_action: { id: nextId, value: f.next, priority: "high" }
+    }],
+    integrity: { completeness_score: null, fresh_session_ready: true, requires_resolution: false }
   }, null, 2);
 
   navigator.clipboard.writeText(jsonBlock).then(() => {
